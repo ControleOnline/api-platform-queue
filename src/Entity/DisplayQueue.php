@@ -17,8 +17,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *          "formats"={"jsonld", "json", "html", "jsonhal", "csv"={"text/csv"}},
  *          "access_control"="is_granted('ROLE_CLIENT')"
  *     }, 
- *     normalizationContext  ={"groups"={"hardware_queue_read"}},
- *     denormalizationContext={"groups"={"hardware_queue_write"}},
+ *     normalizationContext  ={"groups"={"display_queue_read"}},
+ *     denormalizationContext={"groups"={"display_queue_write"}},
  *     attributes            ={"access_control"="is_granted('ROLE_CLIENT')"},
  *     collectionOperations  ={
  *          "get"              ={
@@ -37,11 +37,11 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *         }, 
  *     }
  * )
- * @ORM\Table(name="hardware_queue", uniqueConstraints={@ORM\UniqueConstraint(name="hardware_id", columns={"hardware_id", "queue_id"})}, indexes={@ORM\Index(name="queue_id", columns={"queue_id"}), @ORM\Index(name="IDX_7EAD648851A2DF33", columns={"hardware_id"})})
+ * @ORM\Table(name="display_queue", uniqueConstraints={@ORM\UniqueConstraint(name="display_id", columns={"display_id", "queue_id"})}, indexes={@ORM\Index(name="queue_id", columns={"queue_id"}), @ORM\Index(name="IDX_7EAD648851A2DF33", columns={"display_id"})})
  * @ORM\Entity
  */
 
-class HardwareQueue
+class DisplayQueue
 {
     /**
      * @var int
@@ -49,20 +49,20 @@ class HardwareQueue
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @Groups({"order_read","hardware_queue_read", "hardware_queue_write"})    
+     * @Groups({"order_read","display_queue_read", "display_queue_write"})    
      */
     private $id;
 
     /**
-     * @var \Hardware
+     * @var \Display
      *
-     * @ORM\ManyToOne(targetEntity="Hardware")
+     * @ORM\ManyToOne(targetEntity="Display")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="hardware_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="display_id", referencedColumnName="id")
      * })
-     * @Groups({"order_read","hardware_queue_read", "hardware_queue_write"})    
+     * @Groups({"order_read","display_queue_read", "display_queue_write"})    
      */
-    private $hardware;
+    private $display;
 
     /**
      * @var \Queue
@@ -95,19 +95,19 @@ class HardwareQueue
     }
 
     /**
-     * Get the value of hardware
+     * Get the value of display
      */
-    public function getHardware()
+    public function getDisplay()
     {
-        return $this->hardware;
+        return $this->display;
     }
 
     /**
-     * Set the value of hardware
+     * Set the value of display
      */
-    public function setHardware($hardware): self
+    public function setDisplay($display): self
     {
-        $this->hardware = $hardware;
+        $this->display = $display;
 
         return $this;
     }

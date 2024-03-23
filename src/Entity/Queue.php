@@ -89,9 +89,9 @@ class Queue
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
-     * @ORM\OneToMany(targetEntity="ControleOnline\Entity\HardwareQueue", mappedBy="queue")     
+     * @ORM\OneToMany(targetEntity="ControleOnline\Entity\DisplayQueue", mappedBy="queue")     
      */
-    private $hardwareQueue;
+    private $displayQueue;
 
 
     /**
@@ -185,35 +185,35 @@ class Queue
 
 
     /**
-     * Add HardwareQueue
+     * Add DisplayQueue
      *
-     * @param \ControleOnline\Entity\HardwareQueue $invoice_tax
+     * @param \ControleOnline\Entity\DisplayQueue $invoice_tax
      * @return Order
      */
-    public function addAHardwareQueue(\ControleOnline\Entity\HardwareQueue $hardwareQueue)
+    public function addADisplayQueue(\ControleOnline\Entity\DisplayQueue $displayQueue)
     {
-        $this->hardwareQueue[] = $hardwareQueue;
+        $this->displayQueue[] = $displayQueue;
 
         return $this;
     }
 
     /**
-     * Remove HardwareQueue
+     * Remove DisplayQueue
      *
-     * @param \ControleOnline\Entity\HardwareQueue $invoice_tax
+     * @param \ControleOnline\Entity\DisplayQueue $invoice_tax
      */
-    public function removeHardwareQueue(\ControleOnline\Entity\HardwareQueue $hardwareQueue)
+    public function removeDisplayQueue(\ControleOnline\Entity\DisplayQueue $displayQueue)
     {
-        $this->hardwareQueue->removeElement($hardwareQueue);
+        $this->displayQueue->removeElement($displayQueue);
     }
 
     /**
-     * Get HardwareQueue
+     * Get DisplayQueue
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getHardwareQueue()
+    public function getDisplayQueue()
     {
-        return $this->hardwareQueue;
+        return $this->displayQueue;
     }
 }

@@ -19,8 +19,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *          "formats"={"jsonld", "json", "html", "jsonhal", "csv"={"text/csv"}},
  *          "access_control"="is_granted('ROLE_CLIENT')"
  *     }, 
- *     normalizationContext  ={"groups"={"hardware_read"}},
- *     denormalizationContext={"groups"={"hardware_write"}},
+ *     normalizationContext  ={"groups"={"display_read"}},
+ *     denormalizationContext={"groups"={"display_write"}},
  *     attributes            ={"access_control"="is_granted('ROLE_CLIENT')"},
  *     collectionOperations  ={
  *          "get"              ={
@@ -44,15 +44,15 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  * )
  * @ApiFilter(
  *   SearchFilter::class, properties={ 
- *     "hardwareQueue.queue.orderQueue.status.realStatus": "exact",
- *     "hardwareQueue.queue.orderQueue.status.status": "exact",
+ *     "displayQueue.queue.orderQueue.status.realStatus": "exact",
+ *     "displayQueue.queue.orderQueue.status.status": "exact",
  *   }
  * ) 
- * @ORM\Table(name="hardware", indexes={@ORM\Index(name="company_id", columns={"company_id"})})
+ * @ORM\Table(name="display", indexes={@ORM\Index(name="company_id", columns={"company_id"})})
  * @ORM\Entity
  */
 
-class Hardware
+class Display
 {
     /**
      * @var int
@@ -60,25 +60,25 @@ class Hardware
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @Groups({"order_read","hardware_read", "hardware_write"})   
+     * @Groups({"order_read","display_read", "display_write"})   
      */
     private $id;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="hardware", type="string", length=50, nullable=false)
-     * @Groups({"order_read","hardware_read", "hardware_write"})   
+     * @ORM\Column(name="display", type="string", length=50, nullable=false)
+     * @Groups({"order_read","display_read", "display_write"})   
      */
-    private $hardware;
+    private $display;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="hardware_type", type="string", length=0, nullable=false, options={"default"="'display'"})
-     * @Groups({"order_read","hardware_read", "hardware_write"})   
+     * @ORM\Column(name="display_type", type="string", length=0, nullable=false, options={"default"="'display'"})
+     * @Groups({"order_read","display_read", "display_write"})   
      */
-    private $hardwareType = '\'display\'';
+    private $displayType = '\'display\'';
 
     /**
      * @var \People
@@ -87,7 +87,7 @@ class Hardware
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="company_id", referencedColumnName="id")
      * })
-     * @Groups({"order_read","hardware_read", "hardware_write"})   
+     * @Groups({"order_read","display_read", "display_write"})   
      */
     private $company;
 
@@ -95,9 +95,9 @@ class Hardware
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
-     * @ORM\OneToMany(targetEntity="ControleOnline\Entity\HardwareQueue", mappedBy="hardware")     
+     * @ORM\OneToMany(targetEntity="ControleOnline\Entity\DisplayQueue", mappedBy="display")     
      */
-    private $hardwareQueue;
+    private $displayQueue;
 
 
     /**
@@ -119,37 +119,37 @@ class Hardware
     }
 
     /**
-     * Get the value of hardware
+     * Get the value of display
      */
-    public function getHardware()
+    public function getDisplay()
     {
-        return $this->hardware;
+        return $this->display;
     }
 
     /**
-     * Set the value of hardware
+     * Set the value of display
      */
-    public function setHardware($hardware): self
+    public function setDisplay($display): self
     {
-        $this->hardware = $hardware;
+        $this->display = $display;
 
         return $this;
     }
 
     /**
-     * Get the value of hardwareType
+     * Get the value of displayType
      */
-    public function getHardwareType()
+    public function getDisplayType()
     {
-        return $this->hardwareType;
+        return $this->displayType;
     }
 
     /**
-     * Set the value of hardwareType
+     * Set the value of displayType
      */
-    public function setHardwareType($hardwareType): self
+    public function setDisplayType($displayType): self
     {
-        $this->hardwareType = $hardwareType;
+        $this->displayType = $displayType;
 
         return $this;
     }
@@ -175,35 +175,35 @@ class Hardware
 
 
     /**
-     * Add HardwareQueue
+     * Add DisplayQueue
      *
-     * @param \ControleOnline\Entity\HardwareQueue $invoice_tax
+     * @param \ControleOnline\Entity\DisplayQueue $invoice_tax
      * @return Order
      */
-    public function addAHardwareQueue(\ControleOnline\Entity\HardwareQueue $hardwareQueue)
+    public function addADisplayQueue(\ControleOnline\Entity\DisplayQueue $displayQueue)
     {
-        $this->hardwareQueue[] = $hardwareQueue;
+        $this->displayQueue[] = $displayQueue;
 
         return $this;
     }
 
     /**
-     * Remove HardwareQueue
+     * Remove DisplayQueue
      *
-     * @param \ControleOnline\Entity\HardwareQueue $invoice_tax
+     * @param \ControleOnline\Entity\DisplayQueue $invoice_tax
      */
-    public function removeHardwareQueue(\ControleOnline\Entity\HardwareQueue $hardwareQueue)
+    public function removeDisplayQueue(\ControleOnline\Entity\DisplayQueue $displayQueue)
     {
-        $this->hardwareQueue->removeElement($hardwareQueue);
+        $this->displayQueue->removeElement($displayQueue);
     }
 
     /**
-     * Get HardwareQueue
+     * Get DisplayQueue
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getHardwareQueue()
+    public function getDisplayQueue()
     {
-        return $this->hardwareQueue;
+        return $this->displayQueue;
     }
 }
