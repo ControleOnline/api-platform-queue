@@ -18,8 +18,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *          "formats"={"jsonld", "json", "html", "jsonhal", "csv"={"text/csv"}},
  *          "access_control"="is_granted('ROLE_CLIENT')"
  *     }, 
- *     normalizationContext  ={"groups"={"order_queue_read"}},
- *     denormalizationContext={"groups"={"order_queue_write"}},
+ *     normalizationContext  ={"groups"={"order_queue:read"}},
+ *     denormalizationContext={"groups"={"order_queue:write"}},
  *     attributes            ={"access_control"="is_granted('ROLE_CLIENT')"},
  *     collectionOperations  ={
  *          "get"              ={
@@ -51,7 +51,7 @@ class OrderQueue
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @Groups({"order_read","order_queue_read", "order_queue_write"}) 
+     * @Groups({"order:read","order_queue:read", "order_queue:write"}) 
      */
     private $id;
 
@@ -59,7 +59,7 @@ class OrderQueue
      * @var string
      *
      * @ORM\Column(name="priority", type="string", length=0, nullable=false)
-     * @Groups({"order_read","order_queue_read", "order_queue_write"})  
+     * @Groups({"order:read","order_queue:read", "order_queue:write"})  
      */
     private $priority;
 
@@ -67,7 +67,7 @@ class OrderQueue
      * @var \DateTime
      *
      * @ORM\Column(name="register_time", type="datetime", nullable=false, options={"default"="current_timestamp()"})
-     * @Groups({"order_read","order_queue_read", "order_queue_write"})   
+     * @Groups({"order:read","order_queue:read", "order_queue:write"})   
      */
     private $registerTime = 'current_timestamp()';
 
@@ -75,7 +75,7 @@ class OrderQueue
      * @var \DateTime
      *
      * @ORM\Column(name="update_time", type="datetime", nullable=false, options={"default"="current_timestamp()"})
-     * @Groups({"order_read","order_queue_read", "order_queue_write"})  
+     * @Groups({"order:read","order_queue:read", "order_queue:write"})  
      */
     private $updateTime = 'current_timestamp()';
 
@@ -86,7 +86,7 @@ class OrderQueue
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="order_id", referencedColumnName="id")
      * })
-     * @Groups({"order_queue_read", "order_queue_write"})  
+     * @Groups({"order_queue:read", "order_queue:write"})  
      */
     private $order;
 
@@ -97,7 +97,7 @@ class OrderQueue
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="status_id", referencedColumnName="id")
      * })
-     * @Groups({"order_read","order_queue_read", "order_queue_write"})  
+     * @Groups({"order:read","order_queue:read", "order_queue:write"})  
      */
     private $status;
 
@@ -108,7 +108,7 @@ class OrderQueue
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="queue_id", referencedColumnName="id")
      * })
-     * @Groups({"order_read","order_queue_read", "order_queue_write"})  
+     * @Groups({"order:read","order_queue:read", "order_queue:write"})  
      */
     private $queue;
 

@@ -19,8 +19,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *          "formats"={"jsonld", "json", "html", "jsonhal", "csv"={"text/csv"}},
  *          "access_control"="is_granted('ROLE_CLIENT')"
  *     }, 
- *     normalizationContext  ={"groups"={"display_read"}},
- *     denormalizationContext={"groups"={"display_write"}},
+ *     normalizationContext  ={"groups"={"display:read"}},
+ *     denormalizationContext={"groups"={"display:write"}},
  *     attributes            ={"access_control"="is_granted('ROLE_CLIENT')"},
  *     collectionOperations  ={
  *          "get"              ={
@@ -60,7 +60,7 @@ class Display
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @Groups({"order_read","display_read", "display_write"})   
+     * @Groups({"order:read","display:read", "display:write"})   
      */
     private $id;
 
@@ -68,7 +68,7 @@ class Display
      * @var string
      *
      * @ORM\Column(name="display", type="string", length=50, nullable=false)
-     * @Groups({"order_read","display_read", "display_write"})   
+     * @Groups({"order:read","display:read", "display:write"})   
      */
     private $display;
 
@@ -76,7 +76,7 @@ class Display
      * @var string
      *
      * @ORM\Column(name="display_type", type="string", length=0, nullable=false, options={"default"="'display'"})
-     * @Groups({"order_read","display_read", "display_write"})   
+     * @Groups({"order:read","display:read", "display:write"})   
      */
     private $displayType = '\'display\'';
 
@@ -87,7 +87,7 @@ class Display
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="company_id", referencedColumnName="id")
      * })
-     * @Groups({"order_read","display_read", "display_write"})   
+     * @Groups({"order:read","display:read", "display:write"})   
      */
     private $company;
 

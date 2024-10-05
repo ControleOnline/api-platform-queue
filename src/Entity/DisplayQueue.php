@@ -17,8 +17,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *          "formats"={"jsonld", "json", "html", "jsonhal", "csv"={"text/csv"}},
  *          "access_control"="is_granted('ROLE_CLIENT')"
  *     }, 
- *     normalizationContext  ={"groups"={"display_queue_read"}},
- *     denormalizationContext={"groups"={"display_queue_write"}},
+ *     normalizationContext  ={"groups"={"display_queue:read"}},
+ *     denormalizationContext={"groups"={"display_queue:write"}},
  *     attributes            ={"access_control"="is_granted('ROLE_CLIENT')"},
  *     collectionOperations  ={
  *          "get"              ={
@@ -49,7 +49,7 @@ class DisplayQueue
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @Groups({"order_read","display_queue_read", "display_queue_write"})    
+     * @Groups({"order:read","display_queue:read", "display_queue:write"})    
      */
     private $id;
 
@@ -60,7 +60,7 @@ class DisplayQueue
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="display_id", referencedColumnName="id")
      * })
-     * @Groups({"order_read","display_queue_read", "display_queue_write"})    
+     * @Groups({"order:read","display_queue:read", "display_queue:write"})    
      */
     private $display;
 

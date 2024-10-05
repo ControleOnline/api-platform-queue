@@ -21,8 +21,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *          "formats"={"jsonld", "json", "html", "jsonhal", "csv"={"text/csv"}},
  *          "access_control"="is_granted('ROLE_CLIENT')"
  *     }, 
- *     normalizationContext  ={"groups"={"queue_read"}},
- *     denormalizationContext={"groups"={"queue_write"}},
+ *     normalizationContext  ={"groups"={"queue:read"}},
+ *     denormalizationContext={"groups"={"queue:write"}},
  *     attributes            ={"access_control"="is_granted('ROLE_CLIENT')"},
  *     collectionOperations  ={
  *          "get"              ={
@@ -54,7 +54,7 @@ class Queue
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @Groups({"order_read","queue_read", "queue_write"})   
+     * @Groups({"order:read","queue:read", "queue:write"})   
      */
     private $id;
 
@@ -62,7 +62,7 @@ class Queue
      * @var string
      *
      * @ORM\Column(name="queue", type="string", length=50, nullable=false)
-     * @Groups({"order_read","queue_read", "queue_write"})   
+     * @Groups({"order:read","queue:read", "queue:write"})   
      */
     private $queue;
 
@@ -73,7 +73,7 @@ class Queue
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="company_id", referencedColumnName="id")
      * })
-     * @Groups({"order_read","queue_read", "queue_write"})   
+     * @Groups({"order:read","queue:read", "queue:write"})   
      */
     private $company;
 
