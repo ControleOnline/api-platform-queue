@@ -51,7 +51,7 @@ class OrderQueue
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @Groups({"order:read","order_queue:read", "order_queue:write"}) 
+     * @Groups({"order:read","order_details:read","order_queue:read", "order_queue:write"}) 
      */
     private $id;
 
@@ -59,7 +59,7 @@ class OrderQueue
      * @var string
      *
      * @ORM\Column(name="priority", type="string", length=0, nullable=false)
-     * @Groups({"order:read","order_queue:read", "order_queue:write"})  
+     * @Groups({"order:read","order_details:read","order_queue:read", "order_queue:write"})  
      */
     private $priority;
 
@@ -67,7 +67,7 @@ class OrderQueue
      * @var \DateTime
      *
      * @ORM\Column(name="register_time", type="datetime", nullable=false, options={"default"="current_timestamp()"})
-     * @Groups({"order:read","order_queue:read", "order_queue:write"})   
+     * @Groups({"order:read","order_details:read","order_queue:read", "order_queue:write"})   
      */
     private $registerTime = 'current_timestamp()';
 
@@ -75,7 +75,7 @@ class OrderQueue
      * @var \DateTime
      *
      * @ORM\Column(name="update_time", type="datetime", nullable=false, options={"default"="current_timestamp()"})
-     * @Groups({"order:read","order_queue:read", "order_queue:write"})  
+     * @Groups({"order:read","order_details:read","order_queue:read", "order_queue:write"})  
      */
     private $updateTime = 'current_timestamp()';
 
@@ -97,7 +97,7 @@ class OrderQueue
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="status_id", referencedColumnName="id")
      * })
-     * @Groups({"order:read","order_queue:read", "order_queue:write"})  
+     * @Groups({"order:read","order_details:read","order_queue:read", "order_queue:write"})  
      */
     private $status;
 
@@ -108,7 +108,7 @@ class OrderQueue
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="queue_id", referencedColumnName="id")
      * })
-     * @Groups({"order:read","order_queue:read", "order_queue:write"})  
+     * @Groups({"order:read","order_details:read","order_queue:read", "order_queue:write"})  
      */
     private $queue;
 

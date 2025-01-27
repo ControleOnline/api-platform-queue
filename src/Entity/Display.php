@@ -60,7 +60,7 @@ class Display
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @Groups({"order:read","display:read", "display:write"})   
+     * @Groups({"order:read","order_details:read","display:read", "display:write"})   
      */
     private $id;
 
@@ -68,7 +68,7 @@ class Display
      * @var string
      *
      * @ORM\Column(name="display", type="string", length=50, nullable=false)
-     * @Groups({"order:read","display:read", "display:write"})   
+     * @Groups({"order:read","order_details:read","display:read", "display:write"})   
      */
     private $display;
 
@@ -76,7 +76,7 @@ class Display
      * @var string
      *
      * @ORM\Column(name="display_type", type="string", length=0, nullable=false, options={"default"="'display'"})
-     * @Groups({"order:read","display:read", "display:write"})   
+     * @Groups({"order:read","order_details:read","display:read", "display:write"})   
      */
     private $displayType = '\'display\'';
 
@@ -87,7 +87,7 @@ class Display
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="company_id", referencedColumnName="id")
      * })
-     * @Groups({"order:read","display:read", "display:write"})   
+     * @Groups({"order:read","order_details:read","display:read", "display:write"})   
      */
     private $company;
 
