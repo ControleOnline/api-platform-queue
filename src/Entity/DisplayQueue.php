@@ -49,7 +49,7 @@ class DisplayQueue
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @Groups({"order:read","order_details:read","display_queue:read", "display_queue:write"})    
+     * @Groups({"order:read","order_details:read","order:write","display_queue:read", "display_queue:write"})    
      */
     private $id;
 
@@ -60,7 +60,7 @@ class DisplayQueue
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="display_id", referencedColumnName="id")
      * })
-     * @Groups({"order:read","order_details:read","display_queue:read", "display_queue:write"})    
+     * @Groups({"order:read","order_details:read","order:write","display_queue:read", "display_queue:write"})    
      */
     private $display;
 
