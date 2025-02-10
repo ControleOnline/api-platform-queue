@@ -3,7 +3,6 @@
 namespace ControleOnline\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use ControleOnline\Entity\Orders;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -80,15 +79,15 @@ class OrderProductQueue
     private $updateTime = 'current_timestamp()';
 
     /**
-     * @var Orders
+     * @var OrderProduct
      *
-     * @ORM\ManyToOne(targetEntity="Order")
+     * @ORM\ManyToOne(targetEntity="OrderProduct")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="order_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="order_product_id", referencedColumnName="id")
      * })
      * @Groups({"order_product_queue:read", "order_product_queue:write"})  
      */
-    private $order;
+    private $order_product;
 
     /**
      * @var ControleOnline\Entity\Status
@@ -185,24 +184,6 @@ class OrderProductQueue
     }
 
     /**
-     * Get the value of order
-     */
-    public function getOrder()
-    {
-        return $this->order;
-    }
-
-    /**
-     * Set the value of order
-     */
-    public function setOrder($order): self
-    {
-        $this->order = $order;
-
-        return $this;
-    }
-
-    /**
      * Get the value of status
      */
     public function getStatus()
@@ -234,6 +215,24 @@ class OrderProductQueue
     public function setQueue($queue): self
     {
         $this->queue = $queue;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of order_product
+     */
+    public function getOrderProduct()
+    {
+        return $this->order_product;
+    }
+
+    /**
+     * Set the value of order_product
+     */
+    public function setOrderProduct($order_product): self
+    {
+        $this->order_product = $order_product;
 
         return $this;
     }
