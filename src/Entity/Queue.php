@@ -75,7 +75,7 @@ class Queue
      * })
      * @Groups({"product_category:read","product:read","product_group_product:read","order_product:read","order:read","order_details:read","order:write","queue:read", "queue:write"})   
      */
-    #[ApiFilter(filterClass: SearchFilter::class, properties: ['type' => 'company'])]
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['type' => 'exact'])]
 
     private $company;
 
