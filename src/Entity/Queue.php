@@ -54,7 +54,7 @@ class Queue
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @Groups({"product_category:read","order_product_queue:read","product:read","product_group_product:read","order_product:read","order:read","order_details:read","order:write","queue:read", "queue:write"})   
+     * @Groups({"display_queue:read","product_category:read","order_product_queue:read","product:read","product_group_product:read","order_product:read","order:read","order_details:read","order:write","queue:read", "queue:write"})   
      */
     private $id;
 
@@ -62,7 +62,7 @@ class Queue
      * @var string
      *
      * @ORM\Column(name="queue", type="string", length=50, nullable=false)
-     * @Groups({"product_category:read","order_product_queue:read","product:read","product_group_product:read","order_product:read","order:read","order_details:read","order:write","queue:read", "queue:write"})   
+     * @Groups({"display_queue:read","product_category:read","order_product_queue:read","product:read","product_group_product:read","order_product:read","order:read","order_details:read","order:write","queue:read", "queue:write"})   
      */
     private $queue;
 
@@ -73,7 +73,7 @@ class Queue
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="company_id", referencedColumnName="id")
      * })
-     * @Groups({"product_category:read","order_product_queue:read","product:read","product_group_product:read","order_product:read","order:read","order_details:read","order:write","queue:read", "queue:write"})   
+     * @Groups({"display_queue:read","product_category:read","order_product_queue:read","product:read","product_group_product:read","order_product:read","order:read","order_details:read","order:write","queue:read", "queue:write"})   
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['company' => 'exact'])]
 

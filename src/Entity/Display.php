@@ -60,7 +60,7 @@ class Display
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @Groups({"order:read","order_details:read","order:write","display:read", "display:write"})   
+     * @Groups({"display_queue:read","order:read","order_details:read","order:write","display:read", "display:write"})   
      */
     private $id;
 
@@ -68,7 +68,7 @@ class Display
      * @var string
      *
      * @ORM\Column(name="display", type="string", length=50, nullable=false)
-     * @Groups({"order:read","order_details:read","order:write","display:read", "display:write"})   
+     * @Groups({"display_queue:read","order:read","order_details:read","order:write","display:read", "display:write"})   
      */
     private $display;
 
@@ -76,7 +76,7 @@ class Display
      * @var string
      *
      * @ORM\Column(name="display_type", type="string", length=0, nullable=false, options={"default"="'display'"})
-     * @Groups({"order:read","order_details:read","order:write","display:read", "display:write"})   
+     * @Groups({"display_queue:read","order:read","order_details:read","order:write","display:read", "display:write"})   
      */
     private $displayType = '\'display\'';
 
@@ -87,7 +87,7 @@ class Display
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="company_id", referencedColumnName="id")
      * })
-     * @Groups({"order:read","order_details:read","order:write","display:read", "display:write"})   
+     * @Groups({"display_queue:read","order:read","order_details:read","order:write","display:read", "display:write"})   
      */
     private $company;
 
@@ -98,6 +98,49 @@ class Display
      * @ORM\OneToMany(targetEntity="ControleOnline\Entity\DisplayQueue", mappedBy="display")     
      */
     private $displayQueue;
+
+    /**
+     * @var ControleOnline\Entity\Status
+     *
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Status")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="status_in_id", referencedColumnName="id")
+     * })
+     * @Groups({"order:read","order_details:read","order:write","order_product_queue:read", "order_product_queue:write"})  
+     */
+
+
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['status_in' => 'exact'])]
+
+    private $status_in;
+    /**
+     * @var ControleOnline\Entity\Status
+     *
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Status")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="status_working_id", referencedColumnName="id")
+     * })
+     * @Groups({"order:read","order_details:read","order:write","order_product_queue:read", "order_product_queue:write"})  
+     */
+
+
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['status_working' => 'exact'])]
+
+    private $status_working;
+    /**
+     * @var ControleOnline\Entity\Status
+     *
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Status")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="status_out_id", referencedColumnName="id")
+     * })
+     * @Groups({"order:read","order_details:read","order:write","order_product_queue:read", "order_product_queue:write"})  
+     */
+
+
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['status_out' => 'exact'])]
+
+    private $status_out;
 
 
     /**
@@ -205,5 +248,59 @@ class Display
     public function getDisplayQueue()
     {
         return $this->displayQueue;
+    }
+
+    /**
+     * Get the value of status_in
+     */
+    public function getStatusIn()
+    {
+        return $this->status_in;
+    }
+
+    /**
+     * Set the value of status_in
+     */
+    public function setStatusIn($status_in): self
+    {
+        $this->status_in = $status_in;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of status_working
+     */
+    public function getStatusWorking()
+    {
+        return $this->status_working;
+    }
+
+    /**
+     * Set the value of status_working
+     */
+    public function setStatusWorking($status_working): self
+    {
+        $this->status_working = $status_working;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of status_out
+     */
+    public function getStatusOut()
+    {
+        return $this->status_out;
+    }
+
+    /**
+     * Set the value of status_out
+     */
+    public function setStatusOut($status_out): self
+    {
+        $this->status_out = $status_out;
+
+        return $this;
     }
 }
