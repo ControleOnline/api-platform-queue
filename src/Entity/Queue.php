@@ -54,7 +54,7 @@ class Queue
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @Groups({"order:read","order_details:read","order:write","queue:read", "queue:write"})   
+     * @Groups({"product_category:read","product:read","product_group_product:read","order_product:read","order:read","order_details:read","order:write","queue:read", "queue:write"})   
      */
     private $id;
 
@@ -62,7 +62,7 @@ class Queue
      * @var string
      *
      * @ORM\Column(name="queue", type="string", length=50, nullable=false)
-     * @Groups({"order:read","order_details:read","order:write","queue:read", "queue:write"})   
+     * @Groups({"product_category:read","product:read","product_group_product:read","order_product:read","order:read","order_details:read","order:write","queue:read", "queue:write"})   
      */
     private $queue;
 
@@ -73,7 +73,7 @@ class Queue
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="company_id", referencedColumnName="id")
      * })
-     * @Groups({"order:read","order_details:read","order:write","queue:read", "queue:write"})   
+     * @Groups({"product_category:read","product:read","product_group_product:read","order_product:read","order:read","order_details:read","order:write","queue:read", "queue:write"})   
      */
     private $company;
 
