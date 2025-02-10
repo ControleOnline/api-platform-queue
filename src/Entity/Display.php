@@ -106,7 +106,7 @@ class Display
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="status_in_id", referencedColumnName="id")
      * })
-     * @Groups({"order:read","order_details:read","order:write","order_product_queue:read", "order_product_queue:write"})  
+     * @Groups({"display_queue:read","order:read","order_details:read","order:write","display:read", "display:write"})   
      */
 
 
@@ -120,7 +120,7 @@ class Display
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="status_working_id", referencedColumnName="id")
      * })
-     * @Groups({"order:read","order_details:read","order:write","order_product_queue:read", "order_product_queue:write"})  
+     * @Groups({"display_queue:read","order:read","order_details:read","order:write","display:read", "display:write"})   
      */
 
 
@@ -134,7 +134,7 @@ class Display
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="status_out_id", referencedColumnName="id")
      * })
-     * @Groups({"order:read","order_details:read","order:write","order_product_queue:read", "order_product_queue:write"})  
+     * @Groups({"display_queue:read","order:read","order_details:read","order:write","display:read", "display:write"})   
      */
 
 
