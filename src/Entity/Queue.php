@@ -54,7 +54,7 @@ class Queue
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @Groups({"product_category:read","order_queue:read","product:read","product_group_product:read","order_product:read","order:read","order_details:read","order:write","queue:read", "queue:write"})   
+     * @Groups({"product_category:read","order_product_queue:read","product:read","product_group_product:read","order_product:read","order:read","order_details:read","order:write","queue:read", "queue:write"})   
      */
     private $id;
 
@@ -62,7 +62,7 @@ class Queue
      * @var string
      *
      * @ORM\Column(name="queue", type="string", length=50, nullable=false)
-     * @Groups({"product_category:read","order_queue:read","product:read","product_group_product:read","order_product:read","order:read","order_details:read","order:write","queue:read", "queue:write"})   
+     * @Groups({"product_category:read","order_product_queue:read","product:read","product_group_product:read","order_product:read","order:read","order_details:read","order:write","queue:read", "queue:write"})   
      */
     private $queue;
 
@@ -73,7 +73,7 @@ class Queue
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="company_id", referencedColumnName="id")
      * })
-     * @Groups({"product_category:read","order_queue:read","product:read","product_group_product:read","order_product:read","order:read","order_details:read","order:write","queue:read", "queue:write"})   
+     * @Groups({"product_category:read","order_product_queue:read","product:read","product_group_product:read","order_product:read","order:read","order_details:read","order:write","queue:read", "queue:write"})   
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['company' => 'exact'])]
 
@@ -83,9 +83,9 @@ class Queue
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
-     * @ORM\OneToMany(targetEntity="ControleOnline\Entity\OrderQueue", mappedBy="queue")
+     * @ORM\OneToMany(targetEntity="ControleOnline\Entity\OrderProductQueue", mappedBy="queue")
      */
-    private $orderQueue;
+    private $orderProductQueue;
 
 
     /**
@@ -153,36 +153,36 @@ class Queue
 
 
     /**
-     * Add OrderQueue
+     * Add OrderProductQueue
      *
-     * @param \ControleOnline\Entity\OrderQueue $invoice_tax
+     * @param \ControleOnline\Entity\OrderProductQueue $invoice_tax
      * @return Order
      */
-    public function addAOrderQueue(\ControleOnline\Entity\OrderQueue $orderQueue)
+    public function addAOrderProductQueue(\ControleOnline\Entity\OrderProductQueue $orderProductQueue)
     {
-        $this->orderQueue[] = $orderQueue;
+        $this->orderProductQueue[] = $orderProductQueue;
 
         return $this;
     }
 
     /**
-     * Remove OrderQueue
+     * Remove OrderProductQueue
      *
-     * @param \ControleOnline\Entity\OrderQueue $invoice_tax
+     * @param \ControleOnline\Entity\OrderProductQueue $invoice_tax
      */
-    public function removeOrderQueue(\ControleOnline\Entity\OrderQueue $orderQueue)
+    public function removeOrderProductQueue(\ControleOnline\Entity\OrderProductQueue $orderProductQueue)
     {
-        $this->orderQueue->removeElement($orderQueue);
+        $this->orderProductQueue->removeElement($orderProductQueue);
     }
 
     /**
-     * Get OrderQueue
+     * Get OrderProductQueue
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getOrderQueue()
+    public function getOrderProductQueue()
     {
-        return $this->orderQueue;
+        return $this->orderProductQueue;
     }
 
 
