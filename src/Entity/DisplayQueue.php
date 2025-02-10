@@ -72,6 +72,9 @@ class DisplayQueue
      *   @ORM\JoinColumn(name="queue_id", referencedColumnName="id")
      * })     
      */
+
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['queue' => 'exact'])]
+
     private $queue;
 
 
@@ -87,7 +90,7 @@ class DisplayQueue
     /**
      * Set the value of id
      */
-    public function setId( $id): self
+    public function setId($id): self
     {
         $this->id = $id;
 
