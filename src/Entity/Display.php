@@ -44,8 +44,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  * )
  * @ApiFilter(
  *   SearchFilter::class, properties={ 
- *     "displayQueue.queue.orderQueue.status.realStatus": "exact",
- *     "displayQueue.queue.orderQueue.status.status": "exact",
+ *     "displayQueue.queue.orderProductQueue.status.realStatus": "exact",
+ *     "displayQueue.queue.orderProductQueue.status.status": "exact",
  *   }
  * ) 
  * @ORM\Table(name="display", indexes={@ORM\Index(name="company_id", columns={"company_id"})})
