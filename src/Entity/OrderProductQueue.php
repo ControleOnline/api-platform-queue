@@ -109,6 +109,9 @@ class OrderProductQueue
      * })
      * @Groups({"order:read","order_details:read","order:write","order_product_queue:read", "order_product_queue:write"})  
      */
+
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['queue' => 'exact'])]
+
     private $queue;
 
     /**
