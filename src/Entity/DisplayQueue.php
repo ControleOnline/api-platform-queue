@@ -71,6 +71,7 @@ class DisplayQueue
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="queue_id", referencedColumnName="id")
      * })     
+     * @Groups({"order:read","order_details:read","order:write","display_queue:read", "display_queue:write"})    
      */
 
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['queue' => 'exact'])]
