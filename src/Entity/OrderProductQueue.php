@@ -8,6 +8,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
 
 
 /**
@@ -87,6 +88,8 @@ class OrderProductQueue
      * })
      * @Groups({"order_product_queue:read", "order_product_queue:write"})  
      */
+    #[ApiFilter(ExistsFilter::class, properties: ['order_product.parentProduct'])]
+
     private $order_product;
 
     /**
