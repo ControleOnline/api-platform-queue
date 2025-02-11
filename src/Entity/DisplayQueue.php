@@ -62,6 +62,8 @@ class DisplayQueue
      * })
      * @Groups({"order:read","order_details:read","order:write","display_queue:read", "display_queue:write"})    
      */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['display' => 'exact'])]
+
     private $display;
 
     /**
