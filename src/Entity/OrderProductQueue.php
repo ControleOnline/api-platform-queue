@@ -69,7 +69,7 @@ class OrderProductQueue
      * @ORM\Column(name="register_time", type="datetime", nullable=false, options={"default"="current_timestamp()"})
      * @Groups({"order:read","order_details:read","order:write","order_product_queue:read", "order_product_queue:write"})   
      */
-    private $registerTime;
+    private $registerTime = '';
 
     /**
      * @var \DateTime
@@ -77,7 +77,7 @@ class OrderProductQueue
      * @ORM\Column(name="update_time", type="datetime", nullable=false, options={"default"="current_timestamp()"})
      * @Groups({"order:read","order_details:read","order:write","order_product_queue:read", "order_product_queue:write"})  
      */
-    private $updateTime;
+    private $updateTime = '';
 
     /**
      * @var OrderProduct
