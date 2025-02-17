@@ -9,7 +9,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
-
+use DateTime;
 
 /**
  * @ORM\EntityListeners({ControleOnline\Listener\LogListener::class})
@@ -69,7 +69,7 @@ class OrderProductQueue
      * @ORM\Column(name="register_time", type="datetime", nullable=false, options={"default"="current_timestamp()"})
      * @Groups({"order:read","order_details:read","order:write","order_product_queue:read", "order_product_queue:write"})   
      */
-    private $registerTime = '';
+    private $registerTime;
 
     /**
      * @var \DateTime
@@ -77,7 +77,7 @@ class OrderProductQueue
      * @ORM\Column(name="update_time", type="datetime", nullable=false, options={"default"="current_timestamp()"})
      * @Groups({"order:read","order_details:read","order:write","order_product_queue:read", "order_product_queue:write"})  
      */
-    private $updateTime = '';
+    private $updateTime;
 
     /**
      * @var OrderProduct
@@ -121,6 +121,13 @@ class OrderProductQueue
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['queue' => 'exact'])]
 
     private $queue;
+
+
+    public function __construct()
+    {
+        $this->registerTime = new DateTime('now');
+        $this->updateTime = new DateTime('now');
+    }
 
     /**
      * Get the value of id
