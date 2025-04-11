@@ -6,7 +6,8 @@ use ControleOnline\Entity\Invoice;
 use ControleOnline\Entity\OrderProduct;
 use ControleOnline\Entity\OrderProductQueue;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface
+ AS Security;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
 
