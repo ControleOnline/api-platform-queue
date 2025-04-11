@@ -1,6 +1,7 @@
 <?php
 
-namespace ControleOnline\Entity;
+namespace ControleOnline\Entity; 
+use ControleOnline\Listener\LogListener;
 
 use Doctrine\ORM\Mapping as ORM;
 
@@ -13,90 +14,87 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 
 /**
- * @ORM\EntityListeners({ControleOnline\Listener\LogListener::class})
  * @ApiResource(
  *     attributes={
  *          "formats"={"jsonld", "json", "html", "jsonhal", "csv"={"text/csv"}},
  *          "access_control"="is_granted('ROLE_CLIENT')"
- *     }, 
+ *     },
  *     normalizationContext  ={"groups"={"display:read"}},
  *     denormalizationContext={"groups"={"display:write"}},
  *     attributes            ={"access_control"="is_granted('ROLE_CLIENT')"},
  *     collectionOperations  ={
  *          "get"              ={
- *            "access_control"="is_granted('ROLE_CLIENT')", 
+ *            "access_control"="is_granted('ROLE_CLIENT')",
  *          },
  *         "post"           ={
- *           "access_control"="is_granted('ROLE_CLIENT')",  
+ *           "access_control"="is_granted('ROLE_CLIENT')", 
  *         },
  *     },
  *     itemOperations        ={
  *         "get"           ={
- *           "access_control"="is_granted('ROLE_CLIENT')", 
+ *           "access_control"="is_granted('ROLE_CLIENT')",
  *         },
  *         "put"           ={
- *           "access_control"="is_granted('ROLE_CLIENT')",  
+ *           "access_control"="is_granted('ROLE_CLIENT')", 
  *         },
  *         "delete"           ={
- *           "access_control"="is_granted('ROLE_CLIENT')",  
- *         }, 
+ *           "access_control"="is_granted('ROLE_CLIENT')", 
+ *         },
  *     }
  * )
  * @ApiFilter(
- *   SearchFilter::class, properties={ 
+ *   SearchFilter::class, properties={
  *     "displayQueue.queue.orderProductQueue.status.realStatus": "exact",
  *     "displayQueue.queue.orderProductQueue.status.status": "exact",
  *   }
- * ) 
- * @ORM\Table(name="display", indexes={@ORM\Index(name="company_id", columns={"company_id"})})
- * @ORM\Entity
+ * )
  */
-
+#[ORM\Table(name: 'display')]
+#[ORM\Index(name: 'company_id', columns: ['company_id'])]
+#[ORM\EntityListeners([LogListener::class])]
+#[ORM\Entity]
 class Display
 {
     /**
      * @var int
      *
-     * @ORM\Column(name="id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @Groups({"display_queue:read","order:read","order_details:read","order:write","display:read", "display:write"})   
+     * @Groups({"display_queue:read","order:read","order_details:read","order:write","display:read", "display:write"})  
      */
+    #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     private $id;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="display", type="string", length=50, nullable=false)
-     * @Groups({"display_queue:read","order:read","order_details:read","order:write","display:read", "display:write"})   
+     * @Groups({"display_queue:read","order:read","order_details:read","order:write","display:read", "display:write"})  
      */
+    #[ORM\Column(name: 'display', type: 'string', length: 50, nullable: false)]
     private $display;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="display_type", type="string", length=0, nullable=false, options={"default"="'display'"})
-     * @Groups({"display_queue:read","order:read","order_details:read","order:write","display:read", "display:write"})   
+     * @Groups({"display_queue:read","order:read","order_details:read","order:write","display:read", "display:write"})  
      */
+    #[ORM\Column(name: 'display_type', type: 'string', length: 0, nullable: false, options: ['default' => "'display'"])]
     private $displayType = '\'display\'';
 
     /**
      * @var \People
      *
-     * @ORM\ManyToOne(targetEntity="People")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="company_id", referencedColumnName="id")
-     * })
-     * @Groups({"display_queue:read","order:read","order_details:read","order:write","display:read", "display:write"})   
+     * @Groups({"display_queue:read","order:read","order_details:read","order:write","display:read", "display:write"})  
      */
+    #[ORM\JoinColumn(name: 'company_id', referencedColumnName: 'id')]
+    #[ORM\ManyToOne(targetEntity: \People::class)]
     private $company;
 
 
     /**
-     * @var \Doctrine\Common\Collections\Collection
-     *
-     * @ORM\OneToMany(targetEntity="ControleOnline\Entity\DisplayQueue", mappedBy="display")     
+     * @var \Doctrine\Common\Collections\Collection    
      */
+    #[ORM\OneToMany(targetEntity: \ControleOnline\Entity\DisplayQueue::class, mappedBy: 'display')]
     private $displayQueue;
 
 
