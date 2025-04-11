@@ -1,6 +1,7 @@
 <?php
 
-namespace ControleOnline\Entity;
+namespace ControleOnline\Entity; 
+use ControleOnline\Listener\LogListener;
 
 use Doctrine\ORM\Mapping as ORM;
 
@@ -12,113 +13,105 @@ use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
 use DateTime;
 
 /**
- * @ORM\EntityListeners({ControleOnline\Listener\LogListener::class})
  * @ApiResource(
  *     attributes={
  *          "formats"={"jsonld", "json", "html", "jsonhal", "csv"={"text/csv"}},
  *          "access_control"="is_granted('ROLE_CLIENT')"
- *     }, 
+ *     },
  *     normalizationContext  ={"groups"={"order_product_queue:read"}},
  *     denormalizationContext={"groups"={"order_product_queue:write"}},
  *     attributes            ={"access_control"="is_granted('ROLE_CLIENT')"},
  *     collectionOperations  ={
  *          "get"              ={
- *            "access_control"="is_granted('ROLE_CLIENT')", 
+ *            "access_control"="is_granted('ROLE_CLIENT')",
  *          },
  *     },
  *     itemOperations        ={
  *         "get"           ={
- *           "access_control"="is_granted('ROLE_CLIENT')", 
+ *           "access_control"="is_granted('ROLE_CLIENT')",
  *         },
  *         "put"           ={
- *           "access_control"="is_granted('ROLE_CLIENT')",  
+ *           "access_control"="is_granted('ROLE_CLIENT')", 
  *         },
  *         "delete"           ={
- *           "access_control"="is_granted('ROLE_CLIENT')",  
- *         }, 
+ *           "access_control"="is_granted('ROLE_CLIENT')", 
+ *         },
  *     }
  * )
- * @ORM\Table(name="order_product_queue", indexes={@ORM\Index(name="status_id", columns={"status_id"}), @ORM\Index(name="queue_id", columns={"queue_id"}), @ORM\Index(name="people_id", columns={"order_id"})})
- * @ORM\Entity
  */
-
-
+#[ORM\Table(name: 'order_product_queue')]
+#[ORM\Index(name: 'status_id', columns: ['status_id'])]
+#[ORM\Index(name: 'queue_id', columns: ['queue_id'])]
+#[ORM\Index(name: 'people_id', columns: ['order_id'])]
+#[ORM\EntityListeners([LogListener::class])]
+#[ORM\Entity]
 class OrderProductQueue
 {
     /**
      * @var int
      *
-     * @ORM\Column(name="id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @Groups({"order:read","order_details:read","order:write","order_product_queue:read", "order_product_queue:write"}) 
+     * @Groups({"order:read","order_details:read","order:write","order_product_queue:read", "order_product_queue:write"})
      */
+    #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     private $id;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="priority", type="string", length=0, nullable=false)
-     * @Groups({"order:read","order_details:read","order:write","order_product_queue:read", "order_product_queue:write"})  
+     * @Groups({"order:read","order_details:read","order:write","order_product_queue:read", "order_product_queue:write"}) 
      */
+    #[ORM\Column(name: 'priority', type: 'string', length: 0, nullable: false)]
     private $priority;
 
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="register_time", type="datetime", nullable=false, options={"default"="current_timestamp()"})
-     * @Groups({"order:read","order_details:read","order:write","order_product_queue:read", "order_product_queue:write"})   
+     * @Groups({"order:read","order_details:read","order:write","order_product_queue:read", "order_product_queue:write"})  
      */
+    #[ORM\Column(name: 'register_time', type: 'datetime', nullable: false, options: ['default' => 'current_timestamp()'])]
     private $registerTime;
 
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="update_time", type="datetime", nullable=false, options={"default"="current_timestamp()"})
-     * @Groups({"order:read","order_details:read","order:write","order_product_queue:read", "order_product_queue:write"})  
+     * @Groups({"order:read","order_details:read","order:write","order_product_queue:read", "order_product_queue:write"}) 
      */
+    #[ORM\Column(name: 'update_time', type: 'datetime', nullable: false, options: ['default' => 'current_timestamp()'])]
     private $updateTime;
 
     /**
      * @var OrderProduct
      *
-     * @ORM\ManyToOne(targetEntity="OrderProduct")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="order_product_id", referencedColumnName="id")
-     * })
-     * @Groups({"order_product_queue:read", "order_product_queue:write"})  
+     * @Groups({"order_product_queue:read", "order_product_queue:write"}) 
      */
     #[ApiFilter(ExistsFilter::class, properties: ['order_product.parentProduct'])]
+    #[ORM\JoinColumn(name: 'order_product_id', referencedColumnName: 'id')]
+    #[ORM\ManyToOne(targetEntity: \OrderProduct::class)]
 
     private $order_product;
 
     /**
      * @var ControleOnline\Entity\Status
      *
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Status")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="status_id", referencedColumnName="id")
-     * })
-     * @Groups({"order:read","order_details:read","order:write","order_product_queue:read", "order_product_queue:write"})  
+     * @Groups({"order:read","order_details:read","order:write","order_product_queue:read", "order_product_queue:write"}) 
      */
-
-
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['orderQueue.status.realStatus' => 'exact'])]
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['status' => 'exact'])]
+    #[ORM\JoinColumn(name: 'status_id', referencedColumnName: 'id')]
+    #[ORM\ManyToOne(targetEntity: \ControleOnline\Entity\Status::class)]
 
     private $status;
 
     /**
      * @var \Queue
      *
-     * @ORM\ManyToOne(targetEntity="Queue")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="queue_id", referencedColumnName="id")
-     * })
-     * @Groups({"order:read","order_details:read","order:write","order_product_queue:read", "order_product_queue:write"})  
+     * @Groups({"order:read","order_details:read","order:write","order_product_queue:read", "order_product_queue:write"}) 
      */
-
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['queue' => 'exact'])]
+    #[ORM\JoinColumn(name: 'queue_id', referencedColumnName: 'id')]
+    #[ORM\ManyToOne(targetEntity: \Queue::class)]
 
     private $queue;
 
