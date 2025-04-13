@@ -3,37 +3,28 @@
 namespace ControleOnline\Entity;
 
 use Symfony\Component\Serializer\Attribute\Groups;
-
 use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Delete;
 use ControleOnline\Listener\LogListener;
 use Doctrine\ORM\Mapping as ORM;
 use DateTime;
 
 #[ApiResource(
-    attributes: [
-        'formats' => ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']],
-        'access_control' => 'is_granted(\'ROLE_CLIENT\')'
-    ],
+    formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']],
+    security: "is_granted('ROLE_CLIENT')",
     normalizationContext: ['groups' => ['order_product_queue:read']],
     denormalizationContext: ['groups' => ['order_product_queue:write']],
-    collectionOperations: [
-        'get' => [
-            'access_control' => 'is_granted(\'ROLE_CLIENT\')',
-        ],
-    ],
-    itemOperations: [
-        'get' => [
-            'access_control' => 'is_granted(\'ROLE_CLIENT\')',
-        ],
-        'put' => [
-            'access_control' => 'is_granted(\'ROLE_CLIENT\')',
-        ],
-        'delete' => [
-            'access_control' => 'is_granted(\'ROLE_CLIENT\')',
-        ],
+    operations: [
+        new GetCollection(security: "is_granted('ROLE_CLIENT')"),
+        new Get(security: "is_granted('ROLE_CLIENT')"),
+        new Put(security: "is_granted('ROLE_CLIENT')"),
+        new Delete(security: "is_granted('ROLE_CLIENT')"),
     ]
 )]
 #[ORM\Table(name: 'order_product_queue')]
@@ -68,13 +59,13 @@ class OrderProductQueue
     #[Groups(['order_product_queue:read', 'order_product_queue:write'])]
     private $order_product;
 
-    #[ApiFilter(filterClass: SearchFilter::class, properties: ['orderQueue.status.realStatus' => 'exact', 'status' => 'exact'])]
+    #[ApiFilter(SearchFilter::class, properties: ['orderQueue.status.realStatus' => 'exact', 'status' => 'exact'])]
     #[ORM\JoinColumn(name: 'status_id', referencedColumnName: 'id')]
     #[ORM\ManyToOne(targetEntity: Status::class)]
     #[Groups(['order:read', 'order_details:read', 'order:write', 'order_product_queue:read', 'order_product_queue:write'])]
     private $status;
 
-    #[ApiFilter(filterClass: SearchFilter::class, properties: ['queue' => 'exact'])]
+    #[ApiFilter(SearchFilter::class, properties: ['queue' => 'exact'])]
     #[ORM\JoinColumn(name: 'queue_id', referencedColumnName: 'id')]
     #[ORM\ManyToOne(targetEntity: Queue::class)]
     #[Groups(['order:read', 'order_details:read', 'order:write', 'order_product_queue:read', 'order_product_queue:write'])]
