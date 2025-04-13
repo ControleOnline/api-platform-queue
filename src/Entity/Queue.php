@@ -1,6 +1,8 @@
 <?php
 namespace ControleOnline\Entity;
 
+use Symfony\Component\Serializer\Attribute\Groups;
+
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\Get;
@@ -15,7 +17,6 @@ use ControleOnline\Entity\Status;
 use ControleOnline\Entity\OrderProductQueue;
 use ControleOnline\Entity\DisplayQueue;
 use ControleOnline\Listener\LogListener;
-use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Table(name: 'queue')]
 #[ORM\Index(name: 'company_id', columns: ['company_id'])]

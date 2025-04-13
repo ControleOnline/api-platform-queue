@@ -2,6 +2,8 @@
 
 namespace ControleOnline\Entity;
 
+use Symfony\Component\Serializer\Attribute\Groups;
+
 use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
@@ -45,37 +47,37 @@ class OrderProductQueue
     #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
-    #[ApiResource(normalizationContext: ['groups' => ['order:read', 'order_details:read', 'order:write', 'order_product_queue:read', 'order_product_queue:write']])]
+    #[Groups(['order:read', 'order_details:read', 'order:write', 'order_product_queue:read', 'order_product_queue:write'])]
     private $id;
 
     #[ORM\Column(name: 'priority', type: 'string', length: 0, nullable: false)]
-    #[ApiResource(normalizationContext: ['groups' => ['order:read', 'order_details:read', 'order:write', 'order_product_queue:read', 'order_product_queue:write']])]
+    #[Groups(['order:read', 'order_details:read', 'order:write', 'order_product_queue:read', 'order_product_queue:write'])]
     private $priority;
 
     #[ORM\Column(name: 'register_time', type: 'datetime', nullable: false, options: ['default' => 'current_timestamp()'])]
-    #[ApiResource(normalizationContext: ['groups' => ['order:read', 'order_details:read', 'order:write', 'order_product_queue:read', 'order_product_queue:write']])]
+    #[Groups(['order:read', 'order_details:read', 'order:write', 'order_product_queue:read', 'order_product_queue:write'])]
     private $registerTime;
 
     #[ORM\Column(name: 'update_time', type: 'datetime', nullable: false, options: ['default' => 'current_timestamp()'])]
-    #[ApiResource(normalizationContext: ['groups' => ['order:read', 'order_details:read', 'order:write', 'order_product_queue:read', 'order_product_queue:write']])]
+    #[Groups(['order:read', 'order_details:read', 'order:write', 'order_product_queue:read', 'order_product_queue:write'])]
     private $updateTime;
 
     #[ApiFilter(ExistsFilter::class, properties: ['order_product.parentProduct'])]
     #[ORM\JoinColumn(name: 'order_product_id', referencedColumnName: 'id')]
     #[ORM\ManyToOne(targetEntity: OrderProduct::class)]
-    #[ApiResource(normalizationContext: ['groups' => ['order_product_queue:read', 'order_product_queue:write']])]
+    #[Groups(['order_product_queue:read', 'order_product_queue:write'])]
     private $order_product;
 
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['orderQueue.status.realStatus' => 'exact', 'status' => 'exact'])]
     #[ORM\JoinColumn(name: 'status_id', referencedColumnName: 'id')]
     #[ORM\ManyToOne(targetEntity: Status::class)]
-    #[ApiResource(normalizationContext: ['groups' => ['order:read', 'order_details:read', 'order:write', 'order_product_queue:read', 'order_product_queue:write']])]
+    #[Groups(['order:read', 'order_details:read', 'order:write', 'order_product_queue:read', 'order_product_queue:write'])]
     private $status;
 
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['queue' => 'exact'])]
     #[ORM\JoinColumn(name: 'queue_id', referencedColumnName: 'id')]
     #[ORM\ManyToOne(targetEntity: Queue::class)]
-    #[ApiResource(normalizationContext: ['groups' => ['order:read', 'order_details:read', 'order:write', 'order_product_queue:read', 'order_product_queue:write']])]
+    #[Groups(['order:read', 'order_details:read', 'order:write', 'order_product_queue:read', 'order_product_queue:write'])]
     private $queue;
 
     public function __construct()
