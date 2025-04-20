@@ -38,7 +38,7 @@ class DisplayQueue
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     #[Groups(['order:read', 'order_details:read', 'order:write', 'display_queue:read', 'display_queue:write'])]
-    private int $id;
+    private int $id = 0;
 
     #[ORM\JoinColumn(name: 'display_id', referencedColumnName: 'id')]
     #[ORM\ManyToOne(targetEntity: Display::class)]
