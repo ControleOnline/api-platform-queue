@@ -37,17 +37,17 @@ class DisplayQueue
     #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
-    #[Groups(['order:read', 'order_details:read', 'order:write', 'display_queue:read', 'display_queue:write'])]
+    #[Groups(['order:read', 'order_details:read', 'order:write',  'display_queue:read', 'display_queue:write'])]
     private int $id = 0;
 
     #[ORM\JoinColumn(name: 'display_id', referencedColumnName: 'id')]
     #[ORM\ManyToOne(targetEntity: Display::class)]
-    #[Groups(['order:read', 'order_details:read', 'order:write', 'display_queue:read', 'display_queue:write'])]
+    #[Groups(['order:read', 'order_details:read', 'order:write',  'display_queue:read', 'display_queue:write'])]
     private Display $display;
 
     #[ORM\JoinColumn(name: 'queue_id', referencedColumnName: 'id')]
     #[ORM\ManyToOne(targetEntity: Queue::class)]
-    #[Groups(['order:read', 'order_details:read', 'order:write', 'display_queue:read', 'display_queue:write'])]
+    #[Groups(['order:read', 'order_details:read', 'order:write',  'display_queue:read', 'display_queue:write'])]
     private Queue $queue;
 
     public function getId(): int

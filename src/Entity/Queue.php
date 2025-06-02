@@ -40,35 +40,35 @@ class Queue
     #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
-    #[Groups(['display_queue:read', 'product_category:read', 'order_product_queue:read', 'product:read', 'product_group_product:read', 'order_product:read', 'order:read', 'order_details:read', 'order:write', 'queue:read', 'queue:write'])]
+    #[Groups(['display_queue:read', 'product_category:read', 'order_product_queue:read', 'product:read', 'product_group_product:read', 'order_product:read', 'order:read', 'order_details:read', 'order:write',  'queue:read', 'queue:write'])]
     private $id;
 
     #[ORM\Column(name: 'queue', type: 'string', length: 50, nullable: false)]
-    #[Groups(['display_queue:read', 'product_category:read', 'order_product_queue:read', 'product:read', 'product_group_product:read', 'order_product:read', 'order:read', 'order_details:read', 'order:write', 'queue:read', 'queue:write'])]
+    #[Groups(['display_queue:read', 'product_category:read', 'order_product_queue:read', 'product:read', 'product_group_product:read', 'order_product:read', 'order:read', 'order_details:read', 'order:write',  'queue:read', 'queue:write'])]
     private $queue;
 
     #[ORM\ManyToOne(targetEntity: Status::class)]
     #[ORM\JoinColumn(name: 'status_in_id', referencedColumnName: 'id')]
     #[ApiFilter(SearchFilter::class, properties: ['status_in' => 'exact'])]
-    #[Groups(['display_queue:read', 'order:read', 'order_details:read', 'order:write', 'display:read', 'display:write'])]
+    #[Groups(['display_queue:read', 'order:read', 'order_details:read', 'order:write',  'display:read', 'display:write'])]
     private $status_in;
 
     #[ORM\ManyToOne(targetEntity: Status::class)]
     #[ORM\JoinColumn(name: 'status_working_id', referencedColumnName: 'id')]
     #[ApiFilter(SearchFilter::class, properties: ['status_working' => 'exact'])]
-    #[Groups(['display_queue:read', 'order:read', 'order_details:read', 'order:write', 'display:read', 'display:write'])]
+    #[Groups(['display_queue:read', 'order:read', 'order_details:read', 'order:write',  'display:read', 'display:write'])]
     private $status_working;
 
     #[ORM\ManyToOne(targetEntity: Status::class)]
     #[ORM\JoinColumn(name: 'status_out_id', referencedColumnName: 'id')]
     #[ApiFilter(SearchFilter::class, properties: ['status_out' => 'exact'])]
-    #[Groups(['display_queue:read', 'order:read', 'order_details:read', 'order:write', 'display:read', 'display:write'])]
+    #[Groups(['display_queue:read', 'order:read', 'order_details:read', 'order:write',  'display:read', 'display:write'])]
     private $status_out;
 
     #[ORM\ManyToOne(targetEntity: People::class)]
     #[ORM\JoinColumn(name: 'company_id', referencedColumnName: 'id')]
     #[ApiFilter(SearchFilter::class, properties: ['company' => 'exact'])]
-    #[Groups(['display_queue:read', 'product_category:read', 'order_product_queue:read', 'product:read', 'product_group_product:read', 'order_product:read', 'order:read', 'order_details:read', 'order:write', 'queue:read', 'queue:write'])]
+    #[Groups(['display_queue:read', 'product_category:read', 'order_product_queue:read', 'product:read', 'product_group_product:read', 'order_product:read', 'order:read', 'order_details:read', 'order:write',  'queue:read', 'queue:write'])]
     private $company;
 
     #[ORM\OneToMany(targetEntity: OrderProductQueue::class, mappedBy: 'queue')]

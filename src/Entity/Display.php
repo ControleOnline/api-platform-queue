@@ -44,20 +44,20 @@ class Display
     #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
-    #[Groups(['display_queue:read', 'order:read', 'order_details:read', 'order:write', 'display:read', 'display:write'])]
+    #[Groups(['display_queue:read', 'order:read', 'order_details:read', 'order:write',  'display:read', 'display:write'])]
     private $id;
 
     #[ORM\Column(name: 'display', type: 'string', length: 50, nullable: false)]
-    #[Groups(['display_queue:read', 'order:read', 'order_details:read', 'order:write', 'display:read', 'display:write'])]
+    #[Groups(['display_queue:read', 'order:read', 'order_details:read', 'order:write',  'display:read', 'display:write'])]
     private $display;
 
     #[ORM\Column(name: 'display_type', type: 'string', length: 0, nullable: false, options: ['default' => "'display'"])]
-    #[Groups(['display_queue:read', 'order:read', 'order_details:read', 'order:write', 'display:read', 'display:write'])]
+    #[Groups(['display_queue:read', 'order:read', 'order_details:read', 'order:write',  'display:read', 'display:write'])]
     private $displayType = '\'display\'';
 
     #[ORM\ManyToOne(targetEntity: People::class)]
     #[ORM\JoinColumn(name: 'company_id', referencedColumnName: 'id')]
-    #[Groups(['display_queue:read', 'order:read', 'order_details:read', 'order:write', 'display:read', 'display:write'])]
+    #[Groups(['display_queue:read', 'order:read', 'order_details:read', 'order:write',  'display:read', 'display:write'])]
     private $company;
 
     #[ORM\OneToMany(targetEntity: DisplayQueue::class, mappedBy: 'display')]
