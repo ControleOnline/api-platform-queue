@@ -53,6 +53,7 @@ class OrderProductQueue
     #[Groups(['order:read', 'order_details:read', 'order:write',  'order_product_queue:read', 'order_product_queue:write'])]
     private $updateTime;
 
+    #[ApiFilter(SearchFilter::class, properties: ['order_product.order' => 'exact', 'status' => 'exact'])]
     #[ApiFilter(ExistsFilter::class, properties: ['order_product.parentProduct'])]
     #[ORM\JoinColumn(name: 'order_product_id', referencedColumnName: 'id')]
     #[ORM\ManyToOne(targetEntity: OrderProduct::class)]
