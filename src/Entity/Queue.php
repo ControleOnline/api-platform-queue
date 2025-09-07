@@ -40,11 +40,11 @@ class Queue
     #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
-    #[Groups(['display_queue:read', 'product_category:read', 'order_product_queue:read', 'product:read', 'product_group_product:read', 'order_product:read', 'order:read', 'order_details:read', 'order:write',  'queue:read', 'queue:write'])]
+    #[Groups(['display_queue:read', 'product_category:read', 'order_product_queue:read', 'product:read', 'product_group_product:read', ' 'order_details:read', 'order_product:read',', 'order:read', 'order_details:read', 'order:write',  'queue:read', 'queue:write'])]
     private $id;
 
     #[ORM\Column(name: 'queue', type: 'string', length: 50, nullable: false)]
-    #[Groups(['display_queue:read', 'product_category:read', 'order_product_queue:read', 'product:read', 'product_group_product:read', 'order_product:read', 'order:read', 'order_details:read', 'order:write',  'queue:read', 'queue:write'])]
+    #[Groups(['display_queue:read', 'product_category:read', 'order_product_queue:read', 'product:read', 'product_group_product:read', ' 'order_details:read', 'order_product:read',', 'order:read', 'order_details:read', 'order:write',  'queue:read', 'queue:write'])]
     private $queue;
 
     #[ORM\ManyToOne(targetEntity: Status::class)]
@@ -68,7 +68,7 @@ class Queue
     #[ORM\ManyToOne(targetEntity: People::class)]
     #[ORM\JoinColumn(name: 'company_id', referencedColumnName: 'id')]
     #[ApiFilter(SearchFilter::class, properties: ['company' => 'exact'])]
-    #[Groups(['display_queue:read', 'product_category:read', 'order_product_queue:read', 'product:read', 'product_group_product:read', 'order_product:read', 'order:read', 'order_details:read', 'order:write',  'queue:read', 'queue:write'])]
+    #[Groups(['display_queue:read', 'product_category:read', 'order_product_queue:read', 'product:read', 'product_group_product:read', ' 'order_details:read', 'order_product:read',', 'order:read', 'order_details:read', 'order:write',  'queue:read', 'queue:write'])]
     private $company;
 
     #[ORM\OneToMany(targetEntity: OrderProductQueue::class, mappedBy: 'queue')]
