@@ -16,7 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use ControleOnline\Entity\People;
 use ControleOnline\Entity\DisplayQueue;
-use ControleOnline\Listener\LogListener;
+
 
 #[ORM\Table(name: 'display')]
 #[ORM\Index(name: 'company_id', columns: ['company_id'])]

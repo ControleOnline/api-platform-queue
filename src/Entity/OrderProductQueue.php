@@ -11,7 +11,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Delete;
-use ControleOnline\Listener\LogListener;
+
 use Doctrine\ORM\Mapping as ORM;
 use DateTime;
 

@@ -16,7 +16,7 @@ use ControleOnline\Entity\People;
 use ControleOnline\Entity\Status;
 use ControleOnline\Entity\OrderProductQueue;
 use ControleOnline\Entity\DisplayQueue;
-use ControleOnline\Listener\LogListener;
+
 
 #[ORM\Table(name: 'queue')]
 #[ORM\Index(name: 'company_id', columns: ['company_id'])]
