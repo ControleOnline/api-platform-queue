@@ -31,7 +31,7 @@ use DateTime;
 #[ORM\Index(name: 'status_id', columns: ['status_id'])]
 #[ORM\Index(name: 'queue_id', columns: ['queue_id'])]
 #[ORM\Index(name: 'people_id', columns: ['order_id'])]
-#[ORM\EntityListeners([LogListener::class])]
+
 #[ORM\Entity]
 class OrderProductQueue
 {

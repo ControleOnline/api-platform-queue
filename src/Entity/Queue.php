@@ -21,7 +21,7 @@ use ControleOnline\Listener\LogListener;
 #[ORM\Table(name: 'queue')]
 #[ORM\Index(name: 'company_id', columns: ['company_id'])]
 #[ORM\UniqueConstraint(name: 'queue', columns: ['queue', 'company_id'])]
-#[ORM\EntityListeners([LogListener::class])]
+
 #[ORM\Entity]
 #[ApiResource(
     formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => 'text/csv'],

@@ -30,7 +30,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Index(name: 'queue_id', columns: ['queue_id'])]
 #[ORM\Index(name: 'IDX_7EAD648851A2DF33', columns: ['display_id'])]
 #[ORM\UniqueConstraint(name: 'display_id', columns: ['display_id', 'queue_id'])]
-#[ORM\EntityListeners([LogListener::class])]
+
 #[ORM\Entity]
 class DisplayQueue
 {
