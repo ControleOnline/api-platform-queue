@@ -50,19 +50,19 @@ class Queue
     #[ORM\ManyToOne(targetEntity: Status::class)]
     #[ORM\JoinColumn(name: 'status_in_id', referencedColumnName: 'id')]
     #[ApiFilter(SearchFilter::class, properties: ['status_in' => 'exact'])]
-    #[Groups(['display:read','display_queue:read', 'order:read', 'order_details:read', 'order:write',  'display:read', 'display:write'])]
+    #[Groups(['queue:write','display:read','display_queue:read', 'order:read', 'order_details:read', 'order:write',  'display:read', 'display:write'])]
     private $status_in;
 
     #[ORM\ManyToOne(targetEntity: Status::class)]
     #[ORM\JoinColumn(name: 'status_working_id', referencedColumnName: 'id')]
     #[ApiFilter(SearchFilter::class, properties: ['status_working' => 'exact'])]
-    #[Groups(['display:read','display_queue:read', 'order:read', 'order_details:read', 'order:write',  'display:read', 'display:write'])]
+    #[Groups(['queue:write','display:read','display_queue:read', 'order:read', 'order_details:read', 'order:write',  'display:read', 'display:write'])]
     private $status_working;
 
     #[ORM\ManyToOne(targetEntity: Status::class)]
     #[ORM\JoinColumn(name: 'status_out_id', referencedColumnName: 'id')]
     #[ApiFilter(SearchFilter::class, properties: ['status_out' => 'exact'])]
-    #[Groups(['display:read','display_queue:read', 'order:read', 'order_details:read', 'order:write',  'display:read', 'display:write'])]
+    #[Groups(['queue:write','display:read','display_queue:read', 'order:read', 'order_details:read', 'order:write',  'display:read', 'display:write'])]
     private $status_out;
 
     #[ORM\ManyToOne(targetEntity: People::class)]
