@@ -61,6 +61,7 @@ class Display
     private $company;
 
     #[ORM\OneToMany(targetEntity: DisplayQueue::class, mappedBy: 'display')]
+    #[Groups(['display:read', 'display:write'])]
     private $displayQueue;
 
     public function getId()
