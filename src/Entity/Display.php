@@ -57,7 +57,7 @@ class Display
 
     #[ORM\ManyToOne(targetEntity: People::class)]
     #[ORM\JoinColumn(name: 'company_id', referencedColumnName: 'id')]
-    #[Groups(['display_queue:read', 'order:read', 'order_details:read', 'order:write',  'display:read', 'display:write'])]
+    #[Groups(['display_queue:read', 'order:read', 'order:write',  'display:read', 'display:write'])]
     private $company;
 
     #[ORM\OneToMany(targetEntity: DisplayQueue::class, mappedBy: 'display')]
