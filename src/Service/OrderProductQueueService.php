@@ -48,6 +48,13 @@ class OrderProductQueueService implements EventSubscriberInterface
         }
     }
 
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            EntityChangedEvent::class => 'onEntityChanged',
+        ];
+    }
+
     public function onEntityChanged(EntityChangedEvent $event)
     {
         $oldEntity = $event->getOldEntity();
