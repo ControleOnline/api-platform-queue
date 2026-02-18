@@ -26,7 +26,7 @@ class QueuePeopleQueueRepository extends ServiceEntityRepository
     public function cancelByOrder(Order $order)
     {
 
-        $status = $this->statusService->discoveryRealStatus('canceled', 'canceled', 'display');
+        $status = $this->statusService->discoveryRealStatus('canceled',  'display', 'canceled');
 
         return $this->createQueryBuilder('q')
             ->update()
@@ -42,7 +42,7 @@ class QueuePeopleQueueRepository extends ServiceEntityRepository
     public function closeByOrder(Order $order)
     {
 
-        $status = $this->statusService->discoveryRealStatus('closed', 'closed', 'display');
+        $status = $this->statusService->discoveryRealStatus('closed',  'display', 'closed');
 
         return $this->createQueryBuilder('q')
             ->update()
