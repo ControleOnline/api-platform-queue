@@ -7,6 +7,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
@@ -30,6 +31,7 @@ use ControleOnline\Entity\DisplayQueue;
     security: "is_granted('ROLE_CLIENT')",
     operations: [
         new GetCollection(security: "is_granted('ROLE_CLIENT')"),
+        new Post(security: "is_granted('ROLE_CLIENT')"),
         new Get(security: "is_granted('ROLE_CLIENT')"),
         new Put(security: "is_granted('ROLE_CLIENT')"),
         new Delete(security: "is_granted('ROLE_CLIENT')")

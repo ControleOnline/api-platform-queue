@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -18,6 +19,7 @@ use Doctrine\ORM\Mapping as ORM;
     operations: [
         new Get(security: 'is_granted(\'ROLE_CLIENT\')'),
         new GetCollection(security: 'is_granted(\'ROLE_CLIENT\')'),
+        new Post(security: "is_granted('ROLE_CLIENT')"),
         new Put(security: 'is_granted(\'ROLE_CLIENT\')'),
         new Delete(security: 'is_granted(\'ROLE_CLIENT\')')
     ],
