@@ -12,10 +12,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface
 as Security;
 use Symfony\Component\HttpFoundation\RequestStack;
-use ControleOnline\Event\EntityChangedEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class OrderProductQueueService implements EventSubscriberInterface
+class OrderProductQueueService
 {
     private $request;
     public function __construct(
@@ -50,13 +48,6 @@ class OrderProductQueueService implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EntityChangedEvent::class => 'onEntityChanged',
-        ];
-    }
-
     public function postPersist(OrderProductQueue $orderProductQueue): void
     {
         $order = $orderProductQueue->getOrderProduct()?->getOrder();
@@ -88,19 +79,48 @@ class OrderProductQueueService implements EventSubscriberInterface
         ]);
     }
 
-    public function onEntityChanged(EntityChangedEvent $event)
+    public function syncByOrderStatus(OrderEntity $order): void
     {
-        $oldEntity = $event->getOldEntity();
-        $entity = $event->getEntity();
-
-        if (!$entity instanceof OrderEntity || !$oldEntity instanceof OrderEntity)
+        $provider = $order->getProvider();
+        if (!$provider) {
             return;
+        }
 
-        if ($entity->getStatus()->getRealStatus() == 'canceled')
-            $this->manager->getRepository(OrderProductQueue::class)->cancelByOrder($entity);
+        $realStatus = strtolower(trim((string) ($order->getStatus()?->getRealStatus() ?? '')));
+        $updatedRows = 0;
 
-        if ($entity->getStatus()->getRealStatus() == 'closed')
-            $this->manager->getRepository(OrderProductQueue::class)->closeByOrder($entity);
+        if (in_array($realStatus, ['canceled', 'cancelled'], true)) {
+            $updatedRows = (int) $this->manager
+                ->getRepository(OrderProductQueue::class)
+                ->cancelByOrder($order);
+        }
+
+        if ($realStatus === 'closed') {
+            $updatedRows = (int) $this->manager
+                ->getRepository(OrderProductQueue::class)
+                ->closeByOrder($order);
+        }
+
+        if ($updatedRows < 1) {
+            return;
+        }
+
+        $this->pushToCompanyDevices($provider, [
+            [
+                'store' => 'queues',
+                'event' => 'order_product_queue.updated',
+                'company' => $provider->getId(),
+                'order' => $order->getId(),
+                'sentAt' => date(DATE_ATOM),
+            ],
+            [
+                'store' => 'order_products_queue',
+                'event' => 'order_product_queue.updated',
+                'company' => $provider->getId(),
+                'order' => $order->getId(),
+                'sentAt' => date(DATE_ATOM),
+            ],
+        ]);
     }
 
     private function pushToCompanyDevices(People $company, array $events): void

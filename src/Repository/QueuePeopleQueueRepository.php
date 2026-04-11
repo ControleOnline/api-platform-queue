@@ -6,7 +6,6 @@ use ControleOnline\Entity\Order;
 use ControleOnline\Entity\OrderProductQueue;
 use ControleOnline\Service\StatusService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\Persistence\ManagerRegistry;
 
 
@@ -25,32 +24,48 @@ class QueuePeopleQueueRepository extends ServiceEntityRepository
 
     public function cancelByOrder(Order $order)
     {
-
         $status = $this->statusService->discoveryRealStatus('canceled',  'display', 'canceled');
+        $connection = $this->getEntityManager()->getConnection();
 
-        return $this->createQueryBuilder('q')
-            ->update()
-            ->set('q.status', ':status')
-            ->where('q.order = :order')
-            ->setParameter('status', $status)
-            ->setParameter('order', $order)
-            ->getQuery()
-            ->execute();
+        return $connection->executeStatement(
+            'UPDATE order_product_queue opq
+                INNER JOIN order_product op ON op.id = opq.order_product_id
+             SET
+                opq.status_id = :statusId,
+                opq.update_time = NOW()
+             WHERE
+                op.order_id = :orderId
+                AND (opq.status_id IS NULL OR opq.status_id <> :statusId)',
+            [
+                'statusId' => $status->getId(),
+                'orderId' => $order->getId(),
+            ],
+        );
     }
 
 
     public function closeByOrder(Order $order)
     {
+        $fallbackStatus = $this->statusService->discoveryRealStatus('closed',  'display', 'closed');
+        $connection = $this->getEntityManager()->getConnection();
 
-        $status = $this->statusService->discoveryRealStatus('closed',  'display', 'closed');
-
-        return $this->createQueryBuilder('q')
-            ->update()
-            ->set('q.status', ':status')
-            ->where('q.order = :order')
-            ->setParameter('status', $status)
-            ->setParameter('order', $order)
-            ->getQuery()
-            ->execute();
+        return $connection->executeStatement(
+            'UPDATE order_product_queue opq
+                INNER JOIN order_product op ON op.id = opq.order_product_id
+                LEFT JOIN queue q ON q.id = opq.queue_id
+             SET
+                opq.status_id = COALESCE(q.status_out_id, :fallbackStatusId),
+                opq.update_time = NOW()
+             WHERE
+                op.order_id = :orderId
+                AND (
+                    opq.status_id IS NULL
+                    OR opq.status_id <> COALESCE(q.status_out_id, :fallbackStatusId)
+                )',
+            [
+                'fallbackStatusId' => $fallbackStatus->getId(),
+                'orderId' => $order->getId(),
+            ],
+        );
     }
 }
