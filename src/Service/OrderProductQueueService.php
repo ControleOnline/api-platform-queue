@@ -16,15 +16,19 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class OrderProductQueueService
 {
     private $request;
+    private static $logger;
     public function __construct(
         private EntityManagerInterface $manager,
         private Security $security,
         private PeopleService $PeopleService,
         private WebsocketClient $websocketClient,
+        private OrderPrintService $orderPrintService,
+        private LoggerService $loggerService,
         RequestStack $requestStack
 
     ) {
         $this->request  = $requestStack->getCurrentRequest();
+        self::$logger = $loggerService->getLogger('queue');
     }
 
     public function addProductToQueue(OrderProduct $orderProduct)
@@ -44,6 +48,21 @@ class OrderProductQueueService
                 $orderProductQueue->setQueue($queue);
                 $this->manager->persist($orderProductQueue);
                 $this->manager->flush();
+
+                try {
+                    $this->orderPrintService->autoPrintOrderProductQueueEntry(
+                        $orderProductQueue
+                    );
+                } catch (\Throwable $exception) {
+                    self::$logger?->error(
+                        'Automatic product print failed',
+                        [
+                            'orderProduct' => $orderProduct->getId(),
+                            'orderProductQueue' => $orderProductQueue->getId(),
+                            'message' => $exception->getMessage(),
+                        ]
+                    );
+                }
             }
         }
     }
