@@ -69,33 +69,12 @@ class OrderProductQueueService
 
     public function postPersist(OrderProductQueue $orderProductQueue): void
     {
-        $order = $orderProductQueue->getOrderProduct()?->getOrder();
-        $provider = $order?->getProvider() ?: $orderProductQueue->getQueue()?->getCompany();
+        $this->broadcastQueueMutation($orderProductQueue, 'order_product_queue.created');
+    }
 
-        if (!$provider) {
-            return;
-        }
-
-        $this->pushToCompanyDevices($provider, [
-            [
-                'store' => 'queues',
-                'event' => 'order_product_queue.created',
-                'company' => $provider->getId(),
-                'order' => $order?->getId(),
-                'queue' => $orderProductQueue->getQueue()?->getId(),
-                'orderProductQueue' => $orderProductQueue->getId(),
-                'sentAt' => date(DATE_ATOM),
-            ],
-            [
-                'store' => 'order_products_queue',
-                'event' => 'order_product_queue.created',
-                'company' => $provider->getId(),
-                'order' => $order?->getId(),
-                'queue' => $orderProductQueue->getQueue()?->getId(),
-                'orderProductQueue' => $orderProductQueue->getId(),
-                'sentAt' => date(DATE_ATOM),
-            ],
-        ]);
+    public function postUpdate(OrderProductQueue $orderProductQueue): void
+    {
+        $this->broadcastQueueMutation($orderProductQueue, 'order_product_queue.updated');
     }
 
     public function syncByOrderStatus(OrderEntity $order): void
@@ -106,40 +85,85 @@ class OrderProductQueueService
         }
 
         $realStatus = strtolower(trim((string) ($order->getStatus()?->getRealStatus() ?? '')));
-        $updatedRows = 0;
+
+        if ($realStatus === 'open') {
+            return;
+        }
 
         if (in_array($realStatus, ['canceled', 'cancelled'], true)) {
-            $updatedRows = (int) $this->manager
+            $this->manager
                 ->getRepository(OrderProductQueue::class)
                 ->cancelByOrder($order);
         }
 
         if ($realStatus === 'closed') {
-            $updatedRows = (int) $this->manager
+            $this->manager
                 ->getRepository(OrderProductQueue::class)
                 ->closeByOrder($order);
         }
 
-        if ($updatedRows < 1) {
+        $this->pushToCompanyDevices(
+            $provider,
+            $this->buildQueueEvents(
+                $provider->getId(),
+                $order->getId(),
+                null,
+                null,
+                'order_product_queue.updated'
+            )
+        );
+    }
+
+    private function broadcastQueueMutation(OrderProductQueue $orderProductQueue, string $event): void
+    {
+        $order = $orderProductQueue->getOrderProduct()?->getOrder();
+        $provider = $order?->getProvider() ?: $orderProductQueue->getQueue()?->getCompany();
+
+        if (!$provider) {
             return;
         }
 
-        $this->pushToCompanyDevices($provider, [
-            [
-                'store' => 'queues',
-                'event' => 'order_product_queue.updated',
-                'company' => $provider->getId(),
-                'order' => $order->getId(),
-                'sentAt' => date(DATE_ATOM),
-            ],
-            [
-                'store' => 'order_products_queue',
-                'event' => 'order_product_queue.updated',
-                'company' => $provider->getId(),
-                'order' => $order->getId(),
-                'sentAt' => date(DATE_ATOM),
-            ],
-        ]);
+        $this->pushToCompanyDevices(
+            $provider,
+            $this->buildQueueEvents(
+                $provider->getId(),
+                $order?->getId(),
+                $orderProductQueue->getQueue()?->getId(),
+                $orderProductQueue->getId(),
+                $event
+            )
+        );
+    }
+
+    private function buildQueueEvents(
+        int $companyId,
+        ?int $orderId = null,
+        ?int $queueId = null,
+        ?int $orderProductQueueId = null,
+        string $event = 'order_product_queue.updated'
+    ): array {
+        $baseEvent = [
+            'event' => $event,
+            'company' => $companyId,
+            'sentAt' => date(DATE_ATOM),
+        ];
+
+        if ($orderId) {
+            $baseEvent['order'] = $orderId;
+        }
+
+        if ($queueId) {
+            $baseEvent['queue'] = $queueId;
+        }
+
+        if ($orderProductQueueId) {
+            $baseEvent['orderProductQueue'] = $orderProductQueueId;
+        }
+
+        return [
+            array_merge(['store' => 'queues'], $baseEvent),
+            array_merge(['store' => 'order_products_queue'], $baseEvent),
+        ];
     }
 
     private function pushToCompanyDevices(People $company, array $events): void
