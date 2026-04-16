@@ -5,6 +5,7 @@ namespace ControleOnline\Entity;
 use Symfony\Component\Serializer\Attribute\Groups;
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
@@ -41,6 +42,7 @@ use ControleOnline\Repository\QueuePeopleQueueRepository;
 #[ORM\Index(name: 'queue_id', columns: ['queue_id'])]
 #[ORM\Index(name: 'people_id', columns: ['order_id'])]
 
+#[ApiFilter(OrderFilter::class, properties: ['id', 'registerTime', 'updateTime'])]
 #[ORM\Entity(repositoryClass: QueuePeopleQueueRepository::class)]
 class OrderProductQueue
 {
