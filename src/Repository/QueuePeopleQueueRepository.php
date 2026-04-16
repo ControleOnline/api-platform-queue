@@ -4,6 +4,7 @@ namespace ControleOnline\Repository;
 
 use ControleOnline\Entity\Order;
 use ControleOnline\Entity\OrderProductQueue;
+use ControleOnline\Entity\Status;
 use ControleOnline\Service\StatusService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -22,9 +23,31 @@ class QueuePeopleQueueRepository extends ServiceEntityRepository
         parent::__construct($registry, OrderProductQueue::class);
     }
 
+    private function findExistingDisplayStatusId(array $realStatuses): ?int
+    {
+        $statusRepository = $this->getEntityManager()->getRepository(Status::class);
+
+        foreach ($realStatuses as $realStatus) {
+            $status = $statusRepository->findOneBy([
+                'realStatus' => $realStatus,
+                'context' => 'display',
+            ]);
+
+            if ($status instanceof Status && $status->getId()) {
+                return (int) $status->getId();
+            }
+        }
+
+        return null;
+    }
+
     public function cancelByOrder(Order $order)
     {
-        $status = $this->statusService->discoveryRealStatus('canceled',  'display', 'canceled');
+        $statusId = $this->findExistingDisplayStatusId(['canceled', 'cancelled', 'closed']);
+        if (!$statusId) {
+            return 0;
+        }
+
         $connection = $this->getEntityManager()->getConnection();
 
         return $connection->executeStatement(
@@ -37,7 +60,7 @@ class QueuePeopleQueueRepository extends ServiceEntityRepository
                 op.order_id = :orderId
                 AND (opq.status_id IS NULL OR opq.status_id <> :statusId)',
             [
-                'statusId' => $status->getId(),
+                'statusId' => $statusId,
                 'orderId' => $order->getId(),
             ],
         );
@@ -46,8 +69,29 @@ class QueuePeopleQueueRepository extends ServiceEntityRepository
 
     public function closeByOrder(Order $order)
     {
-        $fallbackStatus = $this->statusService->discoveryRealStatus('closed',  'display', 'closed');
+        $fallbackStatusId = $this->findExistingDisplayStatusId(['closed', 'canceled', 'cancelled']);
         $connection = $this->getEntityManager()->getConnection();
+
+        if (!$fallbackStatusId) {
+            return $connection->executeStatement(
+                'UPDATE order_product_queue opq
+                    INNER JOIN order_product op ON op.id = opq.order_product_id
+                    LEFT JOIN queue q ON q.id = opq.queue_id
+                 SET
+                    opq.status_id = q.status_out_id,
+                    opq.update_time = NOW()
+                 WHERE
+                    op.order_id = :orderId
+                    AND q.status_out_id IS NOT NULL
+                    AND (
+                        opq.status_id IS NULL
+                        OR opq.status_id <> q.status_out_id
+                    )',
+                [
+                    'orderId' => $order->getId(),
+                ],
+            );
+        }
 
         return $connection->executeStatement(
             'UPDATE order_product_queue opq
@@ -63,7 +107,7 @@ class QueuePeopleQueueRepository extends ServiceEntityRepository
                     OR opq.status_id <> COALESCE(q.status_out_id, :fallbackStatusId)
                 )',
             [
-                'fallbackStatusId' => $fallbackStatus->getId(),
+                'fallbackStatusId' => $fallbackStatusId,
                 'orderId' => $order->getId(),
             ],
         );
