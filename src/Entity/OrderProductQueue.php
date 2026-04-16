@@ -9,11 +9,13 @@ use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Delete;
 
 use Doctrine\ORM\Mapping as ORM;
 use DateTime;
+use ControleOnline\Controller\PrintOrderProductQueueAction;
 use ControleOnline\Repository\QueuePeopleQueueRepository;
 
 #[ApiResource(
@@ -24,6 +26,11 @@ use ControleOnline\Repository\QueuePeopleQueueRepository;
     operations: [
         new GetCollection(security: "is_granted('ROLE_CLIENT')"),
         new Get(security: "is_granted('ROLE_CLIENT')"),
+        new Post(
+            security: "is_granted('ROLE_CLIENT')",
+            uriTemplate: '/order_product_queues/{id}/print',
+            controller: PrintOrderProductQueueAction::class
+        ),
         new Put(security: "is_granted('ROLE_CLIENT')"),
         new Delete(security: "is_granted('ROLE_CLIENT')"),
     ]
