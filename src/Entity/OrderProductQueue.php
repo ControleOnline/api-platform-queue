@@ -3,6 +3,7 @@
 namespace ControleOnline\Entity;
 
 use Symfony\Component\Serializer\Attribute\Groups;
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
@@ -54,10 +55,12 @@ class OrderProductQueue
     private $priority;
 
     #[ORM\Column(name: 'register_time', type: 'datetime', nullable: false, options: ['default' => 'current_timestamp()'])]
+    #[ApiFilter(DateFilter::class, properties: ['registerTime'])]
     #[Groups(['order:read', 'order_details:read', 'order_product:read', 'order:write',  'order_product_queue:read', 'orders-queue:read', 'order_product_queue:write'])]
     private $registerTime;
 
     #[ORM\Column(name: 'update_time', type: 'datetime', nullable: false, options: ['default' => 'current_timestamp()'])]
+    #[ApiFilter(DateFilter::class, properties: ['updateTime'])]
     #[Groups(['order:read', 'order_details:read', 'order_product:read', 'order:write',  'order_product_queue:read', 'orders-queue:read', 'order_product_queue:write'])]
     private $updateTime;
 
