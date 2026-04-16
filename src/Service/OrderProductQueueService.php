@@ -79,11 +79,6 @@ class OrderProductQueueService
 
     public function syncByOrderStatus(OrderEntity $order): void
     {
-        $provider = $order->getProvider();
-        if (!$provider) {
-            return;
-        }
-
         $realStatus = strtolower(trim((string) ($order->getStatus()?->getRealStatus() ?? '')));
 
         if ($realStatus === 'open') {
@@ -101,17 +96,6 @@ class OrderProductQueueService
                 ->getRepository(OrderProductQueue::class)
                 ->closeByOrder($order);
         }
-
-        $this->pushToCompanyDevices(
-            $provider,
-            $this->buildQueueEvents(
-                $provider->getId(),
-                $order->getId(),
-                null,
-                null,
-                'order_product_queue.updated'
-            )
-        );
     }
 
     private function broadcastQueueMutation(OrderProductQueue $orderProductQueue, string $event): void

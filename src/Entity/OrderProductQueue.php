@@ -14,6 +14,7 @@ use ApiPlatform\Metadata\Delete;
 
 use Doctrine\ORM\Mapping as ORM;
 use DateTime;
+use ControleOnline\Repository\QueuePeopleQueueRepository;
 
 #[ApiResource(
     formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']],
@@ -32,7 +33,7 @@ use DateTime;
 #[ORM\Index(name: 'queue_id', columns: ['queue_id'])]
 #[ORM\Index(name: 'people_id', columns: ['order_id'])]
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: QueuePeopleQueueRepository::class)]
 class OrderProductQueue
 {
     #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
