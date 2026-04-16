@@ -35,36 +35,124 @@ class OrderProductQueueService
     {
         $product = $orderProduct->getProduct();
         $queue = $product->getQueue();
-        if ($queue) {
+        if (!$queue) {
+            return;
+        }
 
-            $orderProductQueue = $this->manager->getRepository(OrderProductQueue::class)->findOneBy([
-                'order_product' => $orderProduct
-            ]);
-            if (!$orderProductQueue) {
-                $orderProductQueue = new OrderProductQueue();
-                $orderProductQueue->setPriority('priority');
-                $orderProductQueue->setOrderProduct($orderProduct);
-                $orderProductQueue->setStatus($queue->getStatusIn());
-                $orderProductQueue->setQueue($queue);
-                $this->manager->persist($orderProductQueue);
-                $this->manager->flush();
+        $targetQueueEntryCount = $this->resolveQueueEntryCount($orderProduct);
+        $existingQueueEntries = $this->manager
+            ->getRepository(OrderProductQueue::class)
+            ->findBy(
+                ['order_product' => $orderProduct],
+                ['id' => 'ASC']
+            );
 
-                try {
-                    $this->orderPrintService->autoPrintOrderProductQueueEntry(
-                        $orderProductQueue
-                    );
-                } catch (\Throwable $exception) {
-                    self::$logger?->error(
-                        'Automatic product print failed',
-                        [
-                            'orderProduct' => $orderProduct->getId(),
-                            'orderProductQueue' => $orderProductQueue->getId(),
-                            'message' => $exception->getMessage(),
-                        ]
-                    );
-                }
+        $removedQueueEntries = $this->removeExcessQueueEntries(
+            $existingQueueEntries,
+            $queue,
+            $targetQueueEntryCount
+        );
+        if (!empty($removedQueueEntries)) {
+            $existingQueueEntries = array_values(array_filter(
+                $existingQueueEntries,
+                static fn(OrderProductQueue $queueEntry) => !in_array(
+                    $queueEntry,
+                    $removedQueueEntries,
+                    true
+                )
+            ));
+        }
+
+        $missingQueueEntryCount = $targetQueueEntryCount - count($existingQueueEntries);
+        $createdQueueEntries = [];
+
+        for ($i = 0; $i < $missingQueueEntryCount; $i++) {
+            $orderProductQueue = new OrderProductQueue();
+            $orderProductQueue->setPriority('priority');
+            $orderProductQueue->setOrderProduct($orderProduct);
+            $orderProductQueue->setStatus($queue->getStatusIn());
+            $orderProductQueue->setQueue($queue);
+            $this->manager->persist($orderProductQueue);
+            $createdQueueEntries[] = $orderProductQueue;
+        }
+
+        if (empty($removedQueueEntries) && empty($createdQueueEntries)) {
+            return;
+        }
+
+        $this->manager->flush();
+
+        foreach ($removedQueueEntries as $removedQueueEntry) {
+            $this->broadcastQueueMutation(
+                $removedQueueEntry,
+                'order_product_queue.deleted'
+            );
+        }
+
+        foreach ($createdQueueEntries as $createdQueueEntry) {
+            try {
+                $this->orderPrintService->autoPrintOrderProductQueueEntry(
+                    $createdQueueEntry
+                );
+            } catch (\Throwable $exception) {
+                self::$logger?->error(
+                    'Automatic product print failed',
+                    [
+                        'orderProduct' => $orderProduct->getId(),
+                        'orderProductQueue' => $createdQueueEntry->getId(),
+                        'message' => $exception->getMessage(),
+                    ]
+                );
             }
         }
+    }
+
+    private function resolveQueueEntryCount(OrderProduct $orderProduct): int
+    {
+        $quantity = (float) $orderProduct->getQuantity();
+        if ($quantity <= 0) {
+            return 0;
+        }
+
+        return max(1, (int) $quantity);
+    }
+
+    private function removeExcessQueueEntries(
+        array $existingQueueEntries,
+        $queue,
+        int $targetQueueEntryCount
+    ): array {
+        $entriesToRemoveCount = count($existingQueueEntries) - $targetQueueEntryCount;
+        if ($entriesToRemoveCount <= 0) {
+            return [];
+        }
+
+        $initialStatusId = (int) ($queue?->getStatusIn()?->getId() ?? 0);
+        $removableQueueEntries = array_values(array_filter(
+            $existingQueueEntries,
+            static fn(OrderProductQueue $queueEntry) =>
+                (int) ($queueEntry->getStatus()?->getId() ?? 0) === $initialStatusId
+        ));
+
+        usort(
+            $removableQueueEntries,
+            static fn(OrderProductQueue $left, OrderProductQueue $right) =>
+                (int) ($right->getId() ?? 0) <=> (int) ($left->getId() ?? 0)
+        );
+
+        $removedQueueEntries = [];
+
+        foreach ($removableQueueEntries as $queueEntry) {
+            if ($entriesToRemoveCount <= 0) {
+                break;
+            }
+
+            $this->manager->remove($queueEntry);
+            $removedQueueEntries[] = $queueEntry;
+            $entriesToRemoveCount--;
+        }
+
+        return $removedQueueEntries;
     }
 
     public function postPersist(OrderProductQueue $orderProductQueue): void
