@@ -107,6 +107,11 @@ class OrderProductQueueService
         }
     }
 
+    public function findOrderProductQueueById(int $id): ?OrderProductQueue
+    {
+        return $this->manager->getRepository(OrderProductQueue::class)->find($id);
+    }
+
     private function resolveQueueEntryCount(OrderProduct $orderProduct): int
     {
         $quantity = (float) $orderProduct->getQuantity();
