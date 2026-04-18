@@ -22,7 +22,6 @@ class OrderProductQueueService
         private Security $security,
         private PeopleService $PeopleService,
         private WebsocketClient $websocketClient,
-        private OrderPrintService $orderPrintService,
         private LoggerService $loggerService,
         RequestStack $requestStack
 
@@ -89,22 +88,6 @@ class OrderProductQueueService
             );
         }
 
-        foreach ($createdQueueEntries as $createdQueueEntry) {
-            try {
-                $this->orderPrintService->autoPrintOrderProductQueueEntry(
-                    $createdQueueEntry
-                );
-            } catch (\Throwable $exception) {
-                self::$logger?->error(
-                    'Automatic product print failed',
-                    [
-                        'orderProduct' => $orderProduct->getId(),
-                        'orderProductQueue' => $createdQueueEntry->getId(),
-                        'message' => $exception->getMessage(),
-                    ]
-                );
-            }
-        }
     }
 
     public function findOrderProductQueueById(int $id): ?OrderProductQueue
