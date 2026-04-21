@@ -15,6 +15,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class OrderProductQueueService
 {
+    private const ORDER_TYPE_QUOTE = 'quote';
+    private const ORDER_TYPE_SALE = 'sale';
+
     private $request;
     private static $logger;
     public function __construct(
@@ -32,6 +35,11 @@ class OrderProductQueueService
 
     public function addProductToQueue(OrderProduct $orderProduct)
     {
+        $order = $orderProduct->getOrder();
+        if (!$order instanceof OrderEntity || !$this->canManageQueueForOrder($order)) {
+            return;
+        }
+
         $product = $orderProduct->getProduct();
         $queue = $product->getQueue();
         if (!$queue) {
@@ -158,6 +166,13 @@ class OrderProductQueueService
         $realStatus = strtolower(trim((string) ($order->getStatus()?->getRealStatus() ?? '')));
 
         if ($realStatus === 'open') {
+            if ($this->isDraftOrder($order)) {
+                $this->manager
+                    ->getRepository(OrderProductQueue::class)
+                    ->deleteByOrder($order);
+            } elseif ($this->isProductionOrder($order)) {
+                $this->ensureOrderQueueEntries($order);
+            }
             return;
         }
 
@@ -171,6 +186,19 @@ class OrderProductQueueService
             $this->manager
                 ->getRepository(OrderProductQueue::class)
                 ->closeByOrder($order);
+        }
+
+        if ($this->isDraftOrder($order)) {
+            $this->manager
+                ->getRepository(OrderProductQueue::class)
+                ->deleteByOrder($order);
+        }
+    }
+
+    public function ensureOrderQueueEntries(OrderEntity $order): void
+    {
+        foreach ($order->getOrderProducts() as $orderProduct) {
+            $this->addProductToQueue($orderProduct);
         }
     }
 
@@ -224,6 +252,24 @@ class OrderProductQueueService
             array_merge(['store' => 'queues'], $baseEvent),
             array_merge(['store' => 'order_products_queue'], $baseEvent),
         ];
+    }
+
+    private function canManageQueueForOrder(OrderEntity $order): bool
+    {
+        $realStatus = strtolower(trim((string) ($order->getStatus()?->getRealStatus() ?? '')));
+
+        return $this->isProductionOrder($order)
+            && !in_array($realStatus, ['closed', 'canceled', 'cancelled'], true);
+    }
+
+    private function isProductionOrder(OrderEntity $order): bool
+    {
+        return strtolower(trim((string) ($order->getOrderType() ?? ''))) === self::ORDER_TYPE_SALE;
+    }
+
+    private function isDraftOrder(OrderEntity $order): bool
+    {
+        return strtolower(trim((string) ($order->getOrderType() ?? ''))) === self::ORDER_TYPE_QUOTE;
     }
 
     private function pushToCompanyDevices(People $company, array $events): void

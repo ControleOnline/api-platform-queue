@@ -112,4 +112,17 @@ class QueuePeopleQueueRepository extends ServiceEntityRepository
             ],
         );
     }
+
+    public function deleteByOrder(Order $order): int
+    {
+        return $this->getEntityManager()->getConnection()->executeStatement(
+            'DELETE opq
+             FROM order_product_queue opq
+             INNER JOIN order_product op ON op.id = opq.order_product_id
+             WHERE op.order_id = :orderId',
+            [
+                'orderId' => $order->getId(),
+            ],
+        );
+    }
 }
