@@ -3,6 +3,7 @@
 namespace ControleOnline\Service;
 
 use ControleOnline\Entity\DeviceConfig;
+use ControleOnline\Entity\DisplayQueue;
 use ControleOnline\Entity\Order as OrderEntity;
 use ControleOnline\Entity\OrderProduct;
 use ControleOnline\Entity\OrderProductQueue;
@@ -17,6 +18,9 @@ class OrderProductQueueService
 {
     private const ORDER_TYPE_QUOTE = 'quote';
     private const ORDER_TYPE_SALE = 'sale';
+
+    private string $displayDeviceType = 'DISPLAY';
+    private string $displayConfigKey = 'display-id';
 
     private $request;
     private static $logger;
@@ -178,28 +182,20 @@ class OrderProductQueueService
         }
 
         if ($realStatus === 'pending' && $status === 'way') {
-            $this->manager
-                ->getRepository(OrderProductQueue::class)
-                ->closeByOrder($order);
+            $this->closeOrderQueuesAndNotifyDisplays($order);
             return;
         }
 
         if (in_array($realStatus, ['canceled', 'cancelled'], true)) {
-            $this->manager
-                ->getRepository(OrderProductQueue::class)
-                ->cancelByOrder($order);
+            $this->cancelOrderQueuesAndNotifyDisplays($order);
         }
 
         if ($realStatus === 'closed') {
-            $this->manager
-                ->getRepository(OrderProductQueue::class)
-                ->closeByOrder($order);
+            $this->closeOrderQueuesAndNotifyDisplays($order);
         }
 
         if ($this->isDraftOrder($order)) {
-            $this->manager
-                ->getRepository(OrderProductQueue::class)
-                ->deleteByOrder($order);
+            $this->deleteOrderQueuesAndNotifyDisplays($order);
         }
     }
 
@@ -262,6 +258,187 @@ class OrderProductQueueService
         ];
     }
 
+    private function closeOrderQueuesAndNotifyDisplays(OrderEntity $order): void
+    {
+        $updatedRows = $this->manager
+            ->getRepository(OrderProductQueue::class)
+            ->closeByOrder($order);
+
+        if ($updatedRows > 0) {
+            $this->broadcastOrderQueueRefresh($order, 'order_product_queue.updated');
+        }
+    }
+
+    private function cancelOrderQueuesAndNotifyDisplays(OrderEntity $order): void
+    {
+        $updatedRows = $this->manager
+            ->getRepository(OrderProductQueue::class)
+            ->cancelByOrder($order);
+
+        if ($updatedRows > 0) {
+            $this->broadcastOrderQueueRefresh($order, 'order_product_queue.updated');
+        }
+    }
+
+    private function deleteOrderQueuesAndNotifyDisplays(OrderEntity $order): void
+    {
+        $deletedRows = $this->manager
+            ->getRepository(OrderProductQueue::class)
+            ->deleteByOrder($order);
+
+        if ($deletedRows > 0) {
+            $this->broadcastOrderQueueRefresh($order, 'order_product_queue.deleted');
+        }
+    }
+
+    private function broadcastOrderQueueRefresh(OrderEntity $order, string $event): void
+    {
+        $provider = $order->getProvider();
+        if (!$provider instanceof People) {
+            return;
+        }
+
+        $events = $this->buildOrderQueueRefreshEvents(
+            (int) $provider->getId(),
+            $order,
+            $event
+        );
+
+        $displayDeviceConfigs = $this->resolveDisplayDeviceConfigsForOrder($provider, $order);
+        if (!empty($displayDeviceConfigs)) {
+            $this->pushToDeviceConfigs($displayDeviceConfigs, $events);
+            return;
+        }
+
+        $this->pushToCompanyDevices($provider, $events);
+    }
+
+    private function buildOrderQueueRefreshEvents(
+        int $companyId,
+        OrderEntity $order,
+        string $event
+    ): array {
+        $queueIds = array_keys($this->resolveOrderQueues($order));
+        $orderId = $this->normalizeEntityId($order->getId());
+
+        if (empty($queueIds)) {
+            return $this->buildQueueEvents($companyId, $orderId, null, null, $event);
+        }
+
+        $events = [];
+        foreach ($queueIds as $queueId) {
+            $events = array_merge(
+                $events,
+                $this->buildQueueEvents($companyId, $orderId, $queueId, null, $event)
+            );
+        }
+
+        return $events;
+    }
+
+    private function resolveDisplayDeviceConfigsForOrder(
+        People $company,
+        OrderEntity $order
+    ): array {
+        $deviceConfigs = array_values(array_filter(
+            $this->manager->getRepository(DeviceConfig::class)->findBy([
+                'people' => $company,
+            ]),
+            fn($deviceConfig) => $this->isDisplayDeviceConfig($deviceConfig)
+        ));
+
+        if (empty($deviceConfigs)) {
+            return [];
+        }
+
+        $displayIds = $this->resolveOrderDisplayIds($order);
+        if (empty($displayIds)) {
+            return $deviceConfigs;
+        }
+
+        $matchedDeviceConfigs = array_values(array_filter(
+            $deviceConfigs,
+            function (DeviceConfig $deviceConfig) use ($displayIds): bool {
+                $configs = $deviceConfig->getConfigs(true);
+                if (!is_array($configs)) {
+                    return false;
+                }
+
+                $displayId = $this->normalizeEntityId(
+                    $configs[$this->displayConfigKey] ?? null
+                );
+
+                return $displayId !== null && isset($displayIds[$displayId]);
+            }
+        ));
+
+        return !empty($matchedDeviceConfigs) ? $matchedDeviceConfigs : $deviceConfigs;
+    }
+
+    private function resolveOrderDisplayIds(OrderEntity $order): array
+    {
+        $queues = $this->resolveOrderQueues($order);
+        if (empty($queues)) {
+            return [];
+        }
+
+        $displayRows = $this->manager->getRepository(DisplayQueue::class)->findBy([
+            'queue' => array_values($queues),
+        ]);
+
+        $displayIds = [];
+        foreach ($displayRows as $displayRow) {
+            $displayId = $this->normalizeEntityId($displayRow->getDisplay()?->getId());
+            if ($displayId !== null) {
+                $displayIds[$displayId] = true;
+            }
+        }
+
+        return $displayIds;
+    }
+
+    private function resolveOrderQueues(OrderEntity $order): array
+    {
+        $queues = [];
+
+        foreach ($order->getOrderProducts() as $orderProduct) {
+            if ($orderProduct->getOrderProduct() !== null) {
+                continue;
+            }
+
+            foreach ($orderProduct->getOrderProductQueues() as $queueEntry) {
+                $queue = $queueEntry->getQueue();
+                $queueId = $this->normalizeEntityId($queue?->getId());
+
+                if ($queue !== null && $queueId !== null) {
+                    $queues[$queueId] = $queue;
+                }
+            }
+        }
+
+        return $queues;
+    }
+
+    private function isDisplayDeviceConfig(mixed $deviceConfig): bool
+    {
+        return $deviceConfig instanceof DeviceConfig &&
+            strtoupper(trim((string) $deviceConfig->getType())) === $this->displayDeviceType;
+    }
+
+    private function normalizeEntityId(mixed $value): ?int
+    {
+        if (is_object($value) && method_exists($value, 'getId')) {
+            $value = $value->getId();
+        }
+
+        $normalized = preg_replace('/\D+/', '', (string) $value);
+        if ($normalized === null || $normalized === '') {
+            return null;
+        }
+
+        return (int) $normalized;
+    }
+
     private function canManageQueueForOrder(OrderEntity $order): bool
     {
         $realStatus = strtolower(trim((string) ($order->getStatus()?->getRealStatus() ?? '')));
@@ -282,10 +459,16 @@ class OrderProductQueueService
 
     private function pushToCompanyDevices(People $company, array $events): void
     {
-        $deviceConfigs = $this->manager->getRepository(DeviceConfig::class)->findBy([
-            'people' => $company,
-        ]);
+        $this->pushToDeviceConfigs(
+            $this->manager->getRepository(DeviceConfig::class)->findBy([
+                'people' => $company,
+            ]),
+            $events
+        );
+    }
 
+    private function pushToDeviceConfigs(array $deviceConfigs, array $events): void
+    {
         $payload = json_encode($events, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         if ($payload === false) {
             return;
@@ -293,10 +476,13 @@ class OrderProductQueueService
 
         $sentDevices = [];
         foreach ($deviceConfigs as $deviceConfig) {
-            $device = $deviceConfig->getDevice();
-            $deviceId = $device->getId();
+            if (!$deviceConfig instanceof DeviceConfig) {
+                continue;
+            }
 
-            if (isset($sentDevices[$deviceId])) {
+            $device = $deviceConfig->getDevice();
+            $deviceId = $this->normalizeEntityId($device?->getId());
+            if ($deviceId === null || isset($sentDevices[$deviceId])) {
                 continue;
             }
 
