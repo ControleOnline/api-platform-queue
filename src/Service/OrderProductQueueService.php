@@ -164,6 +164,7 @@ class OrderProductQueueService
     public function syncByOrderStatus(OrderEntity $order): void
     {
         $realStatus = strtolower(trim((string) ($order->getStatus()?->getRealStatus() ?? '')));
+        $status = strtolower(trim((string) ($order->getStatus()?->getStatus() ?? '')));
 
         if ($realStatus === 'open') {
             if ($this->isDraftOrder($order)) {
@@ -173,6 +174,13 @@ class OrderProductQueueService
             } elseif ($this->isProductionOrder($order)) {
                 $this->ensureOrderQueueEntries($order);
             }
+            return;
+        }
+
+        if ($realStatus === 'pending' && $status === 'way') {
+            $this->manager
+                ->getRepository(OrderProductQueue::class)
+                ->closeByOrder($order);
             return;
         }
 
