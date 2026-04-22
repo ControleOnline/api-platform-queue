@@ -16,9 +16,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class OrderProductQueueService
 {
-    private const ORDER_TYPE_QUOTE = 'quote';
-    private const ORDER_TYPE_SALE = 'sale';
-
     private string $displayDeviceType = 'DISPLAY';
     private string $displayConfigKey = 'display-id';
 
@@ -449,12 +446,18 @@ class OrderProductQueueService
 
     private function isProductionOrder(OrderEntity $order): bool
     {
-        return strtolower(trim((string) ($order->getOrderType() ?? ''))) === self::ORDER_TYPE_SALE;
+        return strtolower(trim((string) ($order->getOrderType() ?? ''))) === OrderService::ORDER_TYPE_SALE;
     }
 
     private function isDraftOrder(OrderEntity $order): bool
     {
-        return strtolower(trim((string) ($order->getOrderType() ?? ''))) === self::ORDER_TYPE_QUOTE;
+        $orderType = strtolower(trim((string) ($order->getOrderType() ?? '')));
+
+        // Legacy quote carts must stay out of production until they are normalized to cart.
+        return in_array($orderType, [
+            OrderService::ORDER_TYPE_CART,
+            OrderService::ORDER_TYPE_QUOTE,
+        ], true);
     }
 
     private function pushToCompanyDevices(People $company, array $events): void

@@ -15,6 +15,7 @@ use ControleOnline\Entity\Status;
 use ControleOnline\Repository\QueuePeopleQueueRepository;
 use ControleOnline\Service\Client\WebsocketClient;
 use ControleOnline\Service\OrderProductQueueService;
+use ControleOnline\Service\OrderService;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -205,6 +206,58 @@ class OrderProductQueueServiceTest extends TestCase
         $this->queueRepository
             ->expects(self::never())
             ->method('closeByOrder');
+
+        $this->service->syncByOrderStatus($order);
+    }
+
+    public function testOpenCartOrderDeletesPreparationQueuesAsDraft(): void
+    {
+        $status = $this->createConfiguredMock(Status::class, [
+            'getRealStatus' => 'open',
+            'getStatus' => 'open',
+        ]);
+        $order = $this->createConfiguredMock(Order::class, [
+            'getStatus' => $status,
+            'getOrderType' => OrderService::ORDER_TYPE_CART,
+        ]);
+
+        $this->entityManager
+            ->expects(self::once())
+            ->method('getRepository')
+            ->with(OrderProductQueue::class)
+            ->willReturn($this->queueRepository);
+
+        $this->queueRepository
+            ->expects(self::once())
+            ->method('deleteByOrder')
+            ->with($order)
+            ->willReturn(0);
+
+        $this->service->syncByOrderStatus($order);
+    }
+
+    public function testOpenLegacyQuoteOrderStillDeletesPreparationQueues(): void
+    {
+        $status = $this->createConfiguredMock(Status::class, [
+            'getRealStatus' => 'open',
+            'getStatus' => 'open',
+        ]);
+        $order = $this->createConfiguredMock(Order::class, [
+            'getStatus' => $status,
+            'getOrderType' => OrderService::ORDER_TYPE_QUOTE,
+        ]);
+
+        $this->entityManager
+            ->expects(self::once())
+            ->method('getRepository')
+            ->with(OrderProductQueue::class)
+            ->willReturn($this->queueRepository);
+
+        $this->queueRepository
+            ->expects(self::once())
+            ->method('deleteByOrder')
+            ->with($order)
+            ->willReturn(0);
 
         $this->service->syncByOrderStatus($order);
     }
