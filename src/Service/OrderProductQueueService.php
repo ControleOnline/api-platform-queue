@@ -178,7 +178,7 @@ class OrderProductQueueService
             return;
         }
 
-        if ($realStatus === 'pending' && $status === 'way') {
+        if ($realStatus === 'pending' && in_array($status, ['ready', 'way'], true)) {
             $this->closeOrderQueuesAndNotifyDisplays($order);
             return;
         }
