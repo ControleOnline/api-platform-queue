@@ -22,19 +22,19 @@ use ControleOnline\Repository\QueuePeopleQueueRepository;
 
 #[ApiResource(
     formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']],
-    security: "is_granted('ROLE_CLIENT')",
+    security: "is_granted('ROLE_HUMAN')",
     normalizationContext: ['groups' => ['order_product_queue:read']],
     denormalizationContext: ['groups' => ['order_product_queue:write']],
     operations: [
-        new GetCollection(security: "is_granted('ROLE_CLIENT')"),
-        new Get(security: "is_granted('ROLE_CLIENT')"),
+        new GetCollection(security: "is_granted('ROLE_HUMAN')"),
+        new Get(security: "is_granted('ROLE_HUMAN')"),
         new Post(
-            security: "is_granted('ROLE_CLIENT')",
+            security: "is_granted('ROLE_HUMAN')",
             uriTemplate: '/order_product_queues/{id}/print',
             controller: PrintOrderProductQueueAction::class
         ),
-        new Put(security: "is_granted('ROLE_CLIENT')"),
-        new Delete(security: "is_granted('ROLE_CLIENT')"),
+        new Put(security: "is_granted('ROLE_HUMAN')"),
+        new Delete(security: "is_granted('ROLE_HUMAN')"),
     ]
 )]
 #[ORM\Table(name: 'order_product_queue')]

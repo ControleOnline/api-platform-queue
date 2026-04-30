@@ -28,13 +28,13 @@ use ControleOnline\Entity\DisplayQueue;
     formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => 'text/csv'],
     normalizationContext: ['groups' => ['queue:read']],
     denormalizationContext: ['groups' => ['queue:write']],
-    security: "is_granted('ROLE_CLIENT')",
+    security: "is_granted('ROLE_HUMAN')",
     operations: [
-        new GetCollection(security: "is_granted('ROLE_CLIENT')"),
-        new Post(security: "is_granted('ROLE_CLIENT')"),
-        new Get(security: "is_granted('ROLE_CLIENT')"),
-        new Put(security: "is_granted('ROLE_CLIENT')"),
-        new Delete(security: "is_granted('ROLE_CLIENT')")
+        new GetCollection(security: "is_granted('ROLE_HUMAN')"),
+        new Post(security: "is_granted('ROLE_HUMAN')"),
+        new Get(security: "is_granted('ROLE_HUMAN')"),
+        new Put(security: "is_granted('ROLE_HUMAN')"),
+        new Delete(security: "is_granted('ROLE_HUMAN')")
     ]
 )]
 class Queue
