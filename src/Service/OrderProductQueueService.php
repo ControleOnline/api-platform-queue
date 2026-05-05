@@ -8,6 +8,7 @@ use ControleOnline\Entity\Order as OrderEntity;
 use ControleOnline\Entity\OrderProduct;
 use ControleOnline\Entity\OrderProductQueue;
 use ControleOnline\Entity\People;
+use ControleOnline\Entity\Queue;
 use ControleOnline\Service\Client\WebsocketClient;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface
@@ -41,9 +42,8 @@ class OrderProductQueueService
             return;
         }
 
-        $product = $orderProduct->getProduct();
-        $queue = $product->getQueue();
-        if (!$queue) {
+        $queue = $orderProduct->getProduct()?->getQueue();
+        if (!$queue instanceof Queue) {
             return;
         }
 
@@ -54,6 +54,21 @@ class OrderProductQueueService
                 ['order_product' => $orderProduct],
                 ['id' => 'ASC']
             );
+
+        $removedQueueEntries = $this->removeQueueEntriesForOtherQueues(
+            $existingQueueEntries,
+            $queue
+        );
+        if (!empty($removedQueueEntries)) {
+            $existingQueueEntries = array_values(array_filter(
+                $existingQueueEntries,
+                static fn(OrderProductQueue $queueEntry) => !in_array(
+                    $queueEntry,
+                    $removedQueueEntries,
+                    true
+                )
+            ));
+        }
 
         $removedQueueEntries = $this->removeExcessQueueEntries(
             $existingQueueEntries,
@@ -98,7 +113,6 @@ class OrderProductQueueService
         }
 
     }
-
     public function findOrderProductQueueById(int $id): ?OrderProductQueue
     {
         return $this->manager->getRepository(OrderProductQueue::class)->find($id);
@@ -147,6 +161,27 @@ class OrderProductQueueService
             $this->manager->remove($queueEntry);
             $removedQueueEntries[] = $queueEntry;
             $entriesToRemoveCount--;
+        }
+
+        return $removedQueueEntries;
+    }
+
+    private function removeQueueEntriesForOtherQueues(array $existingQueueEntries, Queue $queue): array
+    {
+        $targetQueueId = (int) ($queue->getId() ?? 0);
+        if ($targetQueueId <= 0) {
+            return [];
+        }
+
+        $removedQueueEntries = [];
+        foreach ($existingQueueEntries as $queueEntry) {
+            $existingQueueId = (int) ($queueEntry->getQueue()?->getId() ?? 0);
+            if ($existingQueueId === $targetQueueId) {
+                continue;
+            }
+
+            $this->manager->remove($queueEntry);
+            $removedQueueEntries[] = $queueEntry;
         }
 
         return $removedQueueEntries;
