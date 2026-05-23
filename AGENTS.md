@@ -9,3 +9,4 @@
 - O pedido continua pertencendo a `orders`.
 - `queue` deve cuidar da organizacao operacional da fila, nao da regra comercial do pedido.
 - Fila operacional so enxerga pedido pronto para producao (`orderType = sale`). Carrinho de venda (`cart`) e legado de carrinho em `quote` nao entram em display/KDS.
+- `OrderProductQueueService` persiste apenas a fila real de producao; `showInParentQueue` nao pode criar fila sintética nem duplicar registro para ajuste visual.
