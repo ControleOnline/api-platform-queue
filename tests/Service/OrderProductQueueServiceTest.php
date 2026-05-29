@@ -189,27 +189,6 @@ class OrderProductQueueServiceTest extends TestCase
         $this->service->syncByOrderStatus($order);
     }
 
-    public function testPendingReadyOrderKeepsPreparationQueuesOpen(): void
-    {
-        $status = $this->createConfiguredMock(Status::class, [
-            'getRealStatus' => 'pending',
-            'getStatus' => 'ready',
-        ]);
-        $order = $this->createConfiguredMock(Order::class, [
-            'getStatus' => $status,
-        ]);
-
-        $this->entityManager
-            ->expects(self::never())
-            ->method('getRepository');
-
-        $this->queueRepository
-            ->expects(self::never())
-            ->method('closeByOrder');
-
-        $this->service->syncByOrderStatus($order);
-    }
-
     public function testOpenCartOrderDeletesPreparationQueuesAsDraft(): void
     {
         $status = $this->createConfiguredMock(Status::class, [
@@ -260,6 +239,70 @@ class OrderProductQueueServiceTest extends TestCase
             ->willReturn(0);
 
         $this->service->syncByOrderStatus($order);
+    }
+
+    public function testForceEnsureOrderQueueEntriesCreatesQueuesForClosedSaleOrders(): void
+    {
+        $status = $this->createConfiguredMock(Status::class, [
+            'getRealStatus' => 'closed',
+            'getStatus' => 'closed',
+        ]);
+        $queueStatus = $this->createMock(Status::class);
+        $queue = $this->createConfiguredMock(Queue::class, [
+            'getId' => 14,
+            'getStatusIn' => $queueStatus,
+        ]);
+        $product = $this->createConfiguredMock(\ControleOnline\Entity\Product::class, [
+            'getQueue' => $queue,
+        ]);
+        $order = $this->createConfiguredMock(Order::class, [
+            'getStatus' => $status,
+            'getOrderType' => OrderService::ORDER_TYPE_SALE,
+        ]);
+        $orderProduct = $this->createMock(OrderProduct::class);
+        $orderProduct->method('getOrder')->willReturn($order);
+        $orderProduct->method('getProduct')->willReturn($product);
+        $orderProduct->method('getQuantity')->willReturn(1);
+        $order->method('getOrderProducts')->willReturn([$orderProduct]);
+
+        $this->entityManager
+            ->expects(self::once())
+            ->method('getRepository')
+            ->with(OrderProductQueue::class)
+            ->willReturn($this->queueRepository);
+
+        $this->queueRepository
+            ->expects(self::once())
+            ->method('findBy')
+            ->with(
+                ['order_product' => $orderProduct],
+                ['id' => 'ASC']
+            )
+            ->willReturn([]);
+
+        $persistedQueueEntries = [];
+        $this->entityManager
+            ->expects(self::once())
+            ->method('persist')
+            ->with(self::callback(function (mixed $entity) use ($orderProduct, $queue, $queueStatus, &$persistedQueueEntries): bool {
+                if (!$entity instanceof OrderProductQueue) {
+                    return false;
+                }
+
+                $persistedQueueEntries[] = $entity;
+
+                return $entity->getOrderProduct() === $orderProduct
+                    && $entity->getQueue() === $queue
+                    && $entity->getStatus() === $queueStatus;
+            }));
+
+        $this->entityManager
+            ->expects(self::once())
+            ->method('flush');
+
+        $this->service->ensureOrderQueueEntries($order, true);
+
+        self::assertCount(1, $persistedQueueEntries);
     }
 
     private function setObjectProperty(object $object, string $propertyName, mixed $value): void

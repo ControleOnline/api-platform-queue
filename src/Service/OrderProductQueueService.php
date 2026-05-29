@@ -35,10 +35,14 @@ class OrderProductQueueService
         self::$logger = $loggerService->getLogger('queue');
     }
 
-    public function addProductToQueue(OrderProduct $orderProduct)
+    public function addProductToQueue(OrderProduct $orderProduct, bool $force = false)
     {
         $order = $orderProduct->getOrder();
-        if (!$order instanceof OrderEntity || !$this->canManageQueueForOrder($order)) {
+        if (!$order instanceof OrderEntity || !$this->isProductionOrder($order)) {
+            return;
+        }
+
+        if (!$force && !$this->canManageQueueForOrder($order)) {
             return;
         }
 
@@ -231,10 +235,10 @@ class OrderProductQueueService
         }
     }
 
-    public function ensureOrderQueueEntries(OrderEntity $order): void
+    public function ensureOrderQueueEntries(OrderEntity $order, bool $force = false): void
     {
         foreach ($order->getOrderProducts() as $orderProduct) {
-            $this->addProductToQueue($orderProduct);
+            $this->addProductToQueue($orderProduct, $force);
         }
     }
 
