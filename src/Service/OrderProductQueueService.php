@@ -39,6 +39,7 @@ class OrderProductQueueService
     {
         $order = $orderProduct->getOrder();
         if (!$order instanceof OrderEntity || !$this->isProductionOrder($order)) {
+            // Carrinho nao entra em KDS; apenas pedido sale pode gerar fila de producao.
             return;
         }
 

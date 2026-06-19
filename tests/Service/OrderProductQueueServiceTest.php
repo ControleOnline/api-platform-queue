@@ -189,6 +189,31 @@ class OrderProductQueueServiceTest extends TestCase
         $this->service->syncByOrderStatus($order);
     }
 
+    public function testCartOrderIsIgnoredWhenAddingProductToQueue(): void
+    {
+        $status = $this->createConfiguredMock(Status::class, [
+            'getRealStatus' => 'open',
+            'getStatus' => 'open',
+        ]);
+        $order = $this->createConfiguredMock(Order::class, [
+            'getStatus' => $status,
+            'getOrderType' => OrderService::ORDER_TYPE_CART,
+        ]);
+        $orderProduct = $this->createConfiguredMock(OrderProduct::class, [
+            'getOrder' => $order,
+        ]);
+
+        $this->entityManager
+            ->expects(self::never())
+            ->method('getRepository');
+
+        $this->websocketClient
+            ->expects(self::never())
+            ->method('push');
+
+        $this->service->addProductToQueue($orderProduct);
+    }
+
     public function testOpenCartOrderDeletesPreparationQueuesAsDraft(): void
     {
         $status = $this->createConfiguredMock(Status::class, [
