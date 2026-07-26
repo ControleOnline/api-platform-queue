@@ -41,6 +41,16 @@ use ControleOnline\Entity\DisplayQueue;
 ])]
 class Display
 {
+    public const DISPLAY_TYPE_PRODUCTION = 'production';
+    public const DISPLAY_TYPE_CONFERENCE = 'conference';
+    public const DISPLAY_TYPE_TRACKING = 'tracking';
+
+    private const LEGACY_DISPLAY_TYPES = [
+        'products' => self::DISPLAY_TYPE_PRODUCTION,
+        'orders' => self::DISPLAY_TYPE_CONFERENCE,
+        'tv' => self::DISPLAY_TYPE_TRACKING,
+    ];
+
     #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
@@ -51,9 +61,9 @@ class Display
     #[Groups(['display_queue:read', 'order:read', 'order_details:read', 'order:write',  'display:read', 'display:write'])]
     private $display;
 
-    #[ORM\Column(name: 'display_type', type: 'string', length: 0, nullable: false, options: ['default' => "'display'"])]
+    #[ORM\Column(name: 'display_type', type: 'string', length: 0, nullable: false, options: ['default' => self::DISPLAY_TYPE_PRODUCTION])]
     #[Groups(['display_queue:read', 'order:read', 'order_details:read', 'order:write',  'display:read', 'display:write'])]
-    private $displayType = 'products';
+    private $displayType = self::DISPLAY_TYPE_PRODUCTION;
 
     #[ORM\ManyToOne(targetEntity: People::class)]
     #[ORM\JoinColumn(name: 'company_id', referencedColumnName: 'id')]
@@ -88,13 +98,24 @@ class Display
 
     public function getDisplayType()
     {
-        return $this->displayType;
+        return self::normalizeDisplayType($this->displayType);
     }
 
     public function setDisplayType($displayType): self
     {
-        $this->displayType = $displayType;
+        $this->displayType = self::normalizeDisplayType($displayType);
         return $this;
+    }
+
+    public static function normalizeDisplayType($displayType): string
+    {
+        $type = strtolower(trim((string) $displayType));
+
+        if ($type === '') {
+            return self::DISPLAY_TYPE_PRODUCTION;
+        }
+
+        return self::LEGACY_DISPLAY_TYPES[$type] ?? $type;
     }
 
     public function getCompany()
