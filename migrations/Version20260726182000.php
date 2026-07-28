@@ -11,15 +11,12 @@ final class Version20260726182000 extends TenantAwareMigration
 {
     public function getDescription(): string
     {
-        return 'Rename display_type values to production, conference and tracking.';
+        return 'Restrict display_type values to production, conference and tracking.';
     }
 
     public function up(Schema $schema): void
     {
         $this->addSql("ALTER TABLE display MODIFY display_type ENUM('products','orders','tv','production','conference','tracking') NOT NULL DEFAULT 'production'");
-        $this->addSql("UPDATE display SET display_type = 'production' WHERE display_type = 'products'");
-        $this->addSql("UPDATE display SET display_type = 'conference' WHERE display_type = 'orders'");
-        $this->addSql("UPDATE display SET display_type = 'tracking' WHERE display_type = 'tv'");
         $this->addSql("ALTER TABLE display MODIFY display_type ENUM('production','conference','tracking') NOT NULL DEFAULT 'production'");
     }
 
