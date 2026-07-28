@@ -16,8 +16,7 @@ final class Version20260726182000 extends TenantAwareMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql("ALTER TABLE display MODIFY display_type ENUM('products','orders','tv','production','conference','tracking') NOT NULL DEFAULT 'production'");
-        $this->addSql("ALTER TABLE display MODIFY display_type ENUM('production','conference','tracking') NOT NULL DEFAULT 'production'");
+        return;
     }
 
     public function down(Schema $schema): void

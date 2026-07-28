@@ -21,7 +21,7 @@ final class Version20260714190000 extends AbstractMigration
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `company_id` int(11) NOT NULL,
   `display` varchar(50) CHARACTER SET utf8 NOT NULL,
-  `display_type` enum(\'products\',\'orders\',\'tv\') CHARACTER SET utf8 NOT NULL DEFAULT \'products\',
+  `display_type` enum(\'production\',\'conference\',\'tracking\') CHARACTER SET utf8 NOT NULL DEFAULT \'production\',
   PRIMARY KEY (`id`),
   KEY `company_id` (`company_id`),
   CONSTRAINT `display_ibfk_1` FOREIGN KEY (`company_id`) REFERENCES `people` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
