@@ -42,12 +42,20 @@ class Queue
     #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
-    #[Groups(['display:read','display_queue:read', 'product_category:read', 'order_product_queue:read', 'product:read', 'product_group_product:read',  'order_details:read', 'order_product:read', 'order:read', 'order_details:read', 'order:write',  'queue:read', 'queue:write', 'tracking:read'])]
+    #[Groups(['display:read','display_queue:read', 'product_category:read', 'order_product_queue:read', 'product:read', 'product_group_product:read',  'order_details:read', 'order_product:read', 'order:read', 'order_details:read', 'order:write',  'queue:read', 'queue:write', 'tracking:read', 'order_conference:read'])]
     private $id;
 
     #[ORM\Column(name: 'queue', type: 'string', length: 50, nullable: false)]
-    #[Groups(['display:read','display_queue:read', 'product_category:read', 'order_product_queue:read', 'product:read', 'product_group_product:read',  'order_details:read', 'order_product:read', 'order:read', 'order_details:read', 'order:write',  'queue:read', 'queue:write', 'tracking:read'])]
+    #[Groups(['display:read','display_queue:read', 'product_category:read', 'order_product_queue:read', 'product:read', 'product_group_product:read',  'order_details:read', 'order_product:read', 'order:read', 'order_details:read', 'order:write',  'queue:read', 'queue:write', 'tracking:read', 'order_conference:read'])]
     private $queue;
+
+    #[ORM\Column(name: 'short_label', type: 'string', length: 50, nullable: true)]
+    #[Groups(['display:read', 'display_queue:read', 'product:read', 'order_product_queue:read', 'order_details:read', 'order_product:read', 'queue:read', 'queue:write', 'tracking:read', 'order_conference:read'])]
+    private ?string $shortLabel = null;
+
+    #[ORM\Column(name: 'icon', type: 'string', length: 80, nullable: true)]
+    #[Groups(['display:read', 'display_queue:read', 'product:read', 'order_product_queue:read', 'order_details:read', 'order_product:read', 'queue:read', 'queue:write', 'tracking:read', 'order_conference:read'])]
+    private ?string $icon = null;
 
     #[ORM\ManyToOne(targetEntity: Status::class)]
     #[ORM\JoinColumn(name: 'status_in_id', referencedColumnName: 'id')]
@@ -98,6 +106,30 @@ class Queue
     public function setQueue($queue): self
     {
         $this->queue = $queue;
+        return $this;
+    }
+
+    public function getShortLabel(): ?string
+    {
+        return $this->shortLabel;
+    }
+
+    public function setShortLabel(?string $shortLabel): self
+    {
+        $this->shortLabel = $shortLabel !== null && trim($shortLabel) !== ''
+            ? trim($shortLabel)
+            : null;
+        return $this;
+    }
+
+    public function getIcon(): ?string
+    {
+        return $this->icon;
+    }
+
+    public function setIcon(?string $icon): self
+    {
+        $this->icon = $icon !== null && trim($icon) !== '' ? trim($icon) : null;
         return $this;
     }
 
