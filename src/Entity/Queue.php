@@ -42,11 +42,11 @@ class Queue
     #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
-    #[Groups(['display:read','display_queue:read', 'product_category:read', 'order_product_queue:read', 'product:read', 'product_group_product:read',  'order_details:read', 'order_product:read', 'order:read', 'order_details:read', 'order:write',  'queue:read', 'queue:write'])]
+    #[Groups(['display:read','display_queue:read', 'product_category:read', 'order_product_queue:read', 'product:read', 'product_group_product:read',  'order_details:read', 'order_product:read', 'order:read', 'order_details:read', 'order:write',  'queue:read', 'queue:write', 'tracking:read'])]
     private $id;
 
     #[ORM\Column(name: 'queue', type: 'string', length: 50, nullable: false)]
-    #[Groups(['display:read','display_queue:read', 'product_category:read', 'order_product_queue:read', 'product:read', 'product_group_product:read',  'order_details:read', 'order_product:read', 'order:read', 'order_details:read', 'order:write',  'queue:read', 'queue:write'])]
+    #[Groups(['display:read','display_queue:read', 'product_category:read', 'order_product_queue:read', 'product:read', 'product_group_product:read',  'order_details:read', 'order_product:read', 'order:read', 'order_details:read', 'order:write',  'queue:read', 'queue:write', 'tracking:read'])]
     private $queue;
 
     #[ORM\ManyToOne(targetEntity: Status::class)]
