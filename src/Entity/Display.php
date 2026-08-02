@@ -41,6 +41,13 @@ use ControleOnline\Entity\DisplayQueue;
 ])]
 class Display
 {
+    public const QUEUE_IDENTIFICATION_NONE = 'none';
+    public const QUEUE_IDENTIFICATION_NAME = 'name';
+    public const QUEUE_IDENTIFICATION_SHORT_LABEL = 'short_label';
+    public const QUEUE_IDENTIFICATION_ICON = 'icon';
+    public const STATUS_INDICATOR_BULLET = 'bullet';
+    public const STATUS_INDICATOR_LINE = 'line';
+
     public const DISPLAY_TYPE_PRODUCTION = 'production';
     public const DISPLAY_TYPE_CONFERENCE = 'conference';
     public const DISPLAY_TYPE_TRACKING = 'tracking';
@@ -64,6 +71,22 @@ class Display
     #[ORM\Column(name: 'display_type', type: 'string', length: 0, nullable: false, options: ['default' => self::DISPLAY_TYPE_PRODUCTION])]
     #[Groups(['display_queue:read', 'order:read', 'order_details:read', 'order:write',  'display:read', 'display:write'])]
     private $displayType = self::DISPLAY_TYPE_PRODUCTION;
+
+    #[ORM\Column(name: 'queue_identification_mode', type: 'string', length: 16, nullable: false, options: ['default' => self::QUEUE_IDENTIFICATION_SHORT_LABEL])]
+    #[Groups(['display:read', 'display:write'])]
+    private string $queueIdentificationMode = self::QUEUE_IDENTIFICATION_SHORT_LABEL;
+
+    #[ORM\Column(name: 'status_indicator_mode', type: 'string', length: 16, nullable: false, options: ['default' => self::STATUS_INDICATOR_BULLET])]
+    #[Groups(['display:read', 'display:write'])]
+    private string $statusIndicatorMode = self::STATUS_INDICATOR_BULLET;
+
+    #[ORM\Column(name: 'show_unit_quantity', type: 'boolean', nullable: false, options: ['default' => '0'])]
+    #[Groups(['display:read', 'display:write'])]
+    private bool $showUnitQuantity = false;
+
+    #[ORM\Column(name: 'show_group_names', type: 'boolean', nullable: false, options: ['default' => '0'])]
+    #[Groups(['display:read', 'display:write'])]
+    private bool $showGroupNames = false;
 
     #[ORM\ManyToOne(targetEntity: People::class)]
     #[ORM\JoinColumn(name: 'company_id', referencedColumnName: 'id')]
@@ -116,6 +139,55 @@ class Display
         }
 
         return self::LEGACY_DISPLAY_TYPES[$type] ?? $type;
+    }
+
+    public function getQueueIdentificationMode(): string
+    {
+        return $this->queueIdentificationMode;
+    }
+
+    public function setQueueIdentificationMode(string $mode): self
+    {
+        $allowed = [self::QUEUE_IDENTIFICATION_NONE, self::QUEUE_IDENTIFICATION_NAME, self::QUEUE_IDENTIFICATION_SHORT_LABEL, self::QUEUE_IDENTIFICATION_ICON];
+        $this->queueIdentificationMode = in_array($mode, $allowed, true)
+            ? $mode
+            : self::QUEUE_IDENTIFICATION_SHORT_LABEL;
+        return $this;
+    }
+
+    public function getStatusIndicatorMode(): string
+    {
+        return $this->statusIndicatorMode;
+    }
+
+    public function setStatusIndicatorMode(string $mode): self
+    {
+        $this->statusIndicatorMode = $mode === self::STATUS_INDICATOR_LINE
+            ? self::STATUS_INDICATOR_LINE
+            : self::STATUS_INDICATOR_BULLET;
+        return $this;
+    }
+
+    public function getShowUnitQuantity(): bool
+    {
+        return $this->showUnitQuantity;
+    }
+
+    public function setShowUnitQuantity(bool $showUnitQuantity): self
+    {
+        $this->showUnitQuantity = $showUnitQuantity;
+        return $this;
+    }
+
+    public function getShowGroupNames(): bool
+    {
+        return $this->showGroupNames;
+    }
+
+    public function setShowGroupNames(bool $showGroupNames): self
+    {
+        $this->showGroupNames = $showGroupNames;
+        return $this;
     }
 
     public function getCompany()

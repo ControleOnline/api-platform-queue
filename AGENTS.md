@@ -8,3 +8,8 @@
 - Nao criar bypass `Sem PCP` antes da conferencia: item sem queue deve seguir para `conference`.
 - Depois de `ready`, nao perguntar se o pedido esta pronto; o handoff deve separar delivery, mesa/comanda entregue pelo garcom e retirada pelo cliente.
 - Mesa/comanda (`table`/`tab`) pode gerar preparo antes do pagamento. Pagamento antes da producao so e obrigatorio quando a politica do modo/canal explicitar isso, como no balcao/prepaid checkout; os demais fluxos podem variar. Delivery e sempre depois da producao.
+- Displays `tracking` e `conference` guardam sua apresentacao compacta: modo de identificacao da fila, modo do indicador de status, exibicao de quantidade unitaria e permissao global para nomes de grupos. A fila guarda nome, identificacao curta opcional e icone opcional.
+
+## Qualidade de código
+
+- A barra comum de modularizacao, testes, smoke tests e limite de tamanho de componentes vive em `https://github.com/ControleOnline/agents-mcp/blob/master/skills/shared/code-quality.md`.
