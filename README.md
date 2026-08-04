@@ -3,12 +3,11 @@
 # queue
 
 
-`composer require controleonline/queue:dev-master`
+## Instalacao
+[Instalacao na wiki](https://github.com/ControleOnline/api-platform-queue/wiki/Instalacao)
 
-Add Service import:
-config\services.yaml
+## Links obrigatorios
 
-```yaml
-imports:
-    - { resource: "../modules/controleonline/orders/queue/services/queue.yaml" }    
-```
+- [Documentacao para clientes](http://ajuda.controleonline.com/)
+- [Site institucional](http://controleonline.com/)
+- [Wiki tecnica](https://github.com/ControleOnline/api-platform-queue/wiki)

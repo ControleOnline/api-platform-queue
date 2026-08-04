@@ -1,15 +1,6 @@
-# controleonline/queue
+## Ponto de entrada
 
-## Contratos
-- `display.display_type` usa `production`, `conference` e `tracking`. Valores antigos `products`, `orders` e `tv` devem ser tratados apenas como aliases legados.
-- A ponte PDV -> PPC/PCP e a materializacao em `order_product_queue`; nao modelar esse fluxo como simples troca de status do pedido.
-- A sequencia PCP e `production` -> impressao de barcode -> picking/separation com bipagem -> `conference` -> ready/tracking.
-- Produto sem queue de producao deve ir para `conference`; nao deve pular direto para entrega/pronto.
-- Nao criar bypass `Sem PCP` antes da conferencia: item sem queue deve seguir para `conference`.
-- Depois de `ready`, nao perguntar se o pedido esta pronto; o handoff deve separar delivery, mesa/comanda entregue pelo garcom e retirada pelo cliente.
-- Mesa/comanda (`table`/`tab`) pode gerar preparo antes do pagamento. Pagamento antes da producao so e obrigatorio quando a politica do modo/canal explicitar isso, como no balcao/prepaid checkout; os demais fluxos podem variar. Delivery e sempre depois da producao.
-- Displays `tracking` e `conference` guardam sua apresentacao compacta: modo de identificacao da fila, modo do indicador de status, exibicao de quantidade unitaria e permissao global para nomes de grupos. A fila guarda nome, identificacao curta opcional e icone opcional.
-
-## Qualidade de código
-
-- A barra comum de modularizacao, testes, smoke tests e limite de tamanho de componentes vive em `https://github.com/ControleOnline/agents-mcp/blob/master/skills/shared/code-quality.md`.
+- A documentação funcional e de regras deste modulo vive na wiki do proprio repositório e na wiki principal da API.
+- Regras transversais de qualidade, modularizacao e limites de componente vivem em `https://github.com/ControleOnline/agents-mcp/blob/master/skills/shared/code-quality.md`.
+- Quando houver detalhe especifico de implementacao, prefira comentar no codigo em ingles perto da regra.
+- Este arquivo deve ficar curto e servir apenas como ponte para as fontes oficiais.
