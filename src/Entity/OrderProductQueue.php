@@ -49,21 +49,21 @@ class OrderProductQueue
     #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
-    #[Groups(['order:read', 'order_details:read', 'order_product:read', 'order:write',  'order_product_queue:read', 'orders-queue:read', 'order_product_queue:write'])]
+    #[Groups(['order:read', 'order_conference:read', 'order_details:read', 'order_product:read', 'order:write',  'order_product_queue:read', 'orders-queue:read', 'order_product_queue:write', 'tracking:read'])]
     private $id;
 
     #[ORM\Column(name: 'priority', type: 'string', length: 0, nullable: false)]
-    #[Groups(['order:read', 'order_details:read', 'order_product:read', 'order:write',  'order_product_queue:read', 'orders-queue:read', 'order_product_queue:write'])]
+    #[Groups(['order:read', 'order_conference:read', 'order_details:read', 'order_product:read', 'order:write',  'order_product_queue:read', 'orders-queue:read', 'order_product_queue:write'])]
     private $priority;
 
     #[ORM\Column(name: 'register_time', type: 'datetime', nullable: false, options: ['default' => 'current_timestamp()'])]
     #[ApiFilter(DateFilter::class, properties: ['registerTime'])]
-    #[Groups(['order:read', 'order_details:read', 'order_product:read', 'order:write',  'order_product_queue:read', 'orders-queue:read', 'order_product_queue:write'])]
+    #[Groups(['order:read', 'order_conference:read', 'order_details:read', 'order_product:read', 'order:write',  'order_product_queue:read', 'orders-queue:read', 'order_product_queue:write', 'tracking:read'])]
     private $registerTime;
 
     #[ORM\Column(name: 'update_time', type: 'datetime', nullable: false, options: ['default' => 'current_timestamp()'])]
     #[ApiFilter(DateFilter::class, properties: ['updateTime'])]
-    #[Groups(['order:read', 'order_details:read', 'order_product:read', 'order:write',  'order_product_queue:read', 'orders-queue:read', 'order_product_queue:write'])]
+    #[Groups(['order:read', 'order_conference:read', 'order_details:read', 'order_product:read', 'order:write',  'order_product_queue:read', 'orders-queue:read', 'order_product_queue:write', 'tracking:read'])]
     private $updateTime;
 
     #[ApiFilter(SearchFilter::class, properties: ['order_product.order.provider' => 'exact'])]
@@ -76,13 +76,13 @@ class OrderProductQueue
     #[ApiFilter(SearchFilter::class, properties: ['orderQueue.status.realStatus' => 'exact', 'status' => 'exact'])]
     #[ORM\JoinColumn(name: 'status_id', referencedColumnName: 'id')]
     #[ORM\ManyToOne(targetEntity: Status::class)]
-    #[Groups(['order:read', 'order_details:read', 'order_product:read', 'order:write',  'order_product_queue:read', 'orders-queue:read', 'order_product_queue:write'])]
+    #[Groups(['order:read', 'order_conference:read', 'order_details:read', 'order_product:read', 'order:write',  'order_product_queue:read', 'orders-queue:read', 'order_product_queue:write', 'tracking:read'])]
     private $status;
 
     #[ApiFilter(SearchFilter::class, properties: ['queue' => 'exact'])]
     #[ORM\JoinColumn(name: 'queue_id', referencedColumnName: 'id')]
     #[ORM\ManyToOne(targetEntity: Queue::class)]
-    #[Groups(['order:read', 'order_details:read', 'order_product:read', 'order:write',  'order_product_queue:read', 'orders-queue:read', 'order_product_queue:write'])]
+    #[Groups(['order:read', 'order_conference:read', 'order_details:read', 'order_product:read', 'order:write',  'order_product_queue:read', 'orders-queue:read', 'order_product_queue:write', 'tracking:read'])]
     private $queue;
 
     public function __construct()

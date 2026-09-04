@@ -1,11 +1,6 @@
-## Escopo
-- Modulo de filas operacionais, displays e KDS/PPC.
-- Cobre `Queue`, `Display`, `DisplayQueue`, `OrderProductQueue` e impressao relacionada a filas.
+## Ponto de entrada
 
-## Quando usar
-- Prompts sobre filas de preparo, displays, distribuicao de itens do pedido em filas e operacao de PPC/KDS.
-
-## Limites
-- O pedido continua pertencendo a `orders`.
-- `queue` deve cuidar da organizacao operacional da fila, nao da regra comercial do pedido.
-- Fila operacional so enxerga pedido pronto para producao (`orderType = sale`). Carrinho de venda (`cart`) e legado de carrinho em `quote` nao entram em display/KDS.
+- A documentação funcional e de regras deste modulo vive na wiki do proprio repositório e na wiki principal da API.
+- Regras transversais de qualidade, modularizacao e limites de componente vivem em `https://github.com/ControleOnline/agents-mcp/blob/master/skills/shared/code-quality.md`.
+- Quando houver detalhe especifico de implementacao, prefira comentar no codigo em ingles perto da regra.
+- Este arquivo deve ficar curto e servir apenas como ponte para as fontes oficiais.
