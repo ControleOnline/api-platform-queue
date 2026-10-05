@@ -153,9 +153,9 @@ class OrderProductQueueServiceTest extends TestCase
 
         $this->websocketClient
             ->expects(self::once())
-            ->method('push')
+            ->method('pushMany')
             ->with(
-                $matchingDevice,
+                [$matchingDevice],
                 self::callback(function (string $payload): bool {
                     $events = json_decode($payload, true);
                     if (!is_array($events) || count($events) !== 2) {
@@ -209,7 +209,7 @@ class OrderProductQueueServiceTest extends TestCase
 
         $this->websocketClient
             ->expects(self::never())
-            ->method('push');
+            ->method('pushMany');
 
         $this->service->addProductToQueue($orderProduct);
     }
@@ -328,6 +328,43 @@ class OrderProductQueueServiceTest extends TestCase
         $this->service->ensureOrderQueueEntries($order, true);
 
         self::assertCount(1, $persistedQueueEntries);
+    }
+
+    public function testQueueCreationBatchesAllDistinctCompanyDevicesAndPreservesStoreEvents(): void
+    {
+        $company = $this->createConfiguredMock(People::class, ['getId' => 3]);
+        $order = $this->createConfiguredMock(Order::class, ['getId' => 72956, 'getProvider' => $company]);
+        $product = $this->createConfiguredMock(OrderProduct::class, ['getOrder' => $order]);
+        $queue = $this->createConfiguredMock(Queue::class, ['getId' => 14]);
+        $entry = $this->createConfiguredMock(OrderProductQueue::class, [
+            'getId' => 88, 'getOrderProduct' => $product, 'getQueue' => $queue,
+        ]);
+        $devices = $configs = [];
+        foreach (range(1, 34) as $id) {
+            $device = $this->createConfiguredMock(Device::class, ['getId' => $id]);
+            $devices[] = $device;
+            $configs[] = $this->createConfiguredMock(DeviceConfig::class, ['getDevice' => $device]);
+        }
+        $configs[] = $configs[0];
+        $configs[] = 'not a device config';
+        $this->entityManager->method('getRepository')->with(DeviceConfig::class)->willReturn($this->deviceConfigRepository);
+        $this->deviceConfigRepository->expects(self::once())->method('findBy')->with(['people' => $company])->willReturn($configs);
+        $this->websocketClient->expects(self::never())->method('push');
+        $this->websocketClient->expects(self::once())->method('pushMany')->with($devices,
+            self::callback(function (string $payload): bool {
+                $events = json_decode($payload, true);
+                self::assertSame(['queues', 'order_products_queue'], array_column($events, 'store'));
+                foreach ($events as $event) {
+                    self::assertSame('order_product_queue.created', $event['event']);
+                    self::assertSame(3, $event['company']);
+                    self::assertSame(72956, $event['order']);
+                    self::assertSame(14, $event['queue']);
+                    self::assertSame(88, $event['orderProductQueue']);
+                    self::assertNotEmpty($event['sentAt']);
+                }
+                return true;
+            }))->willReturn([]);
+        $this->service->postPersist($entry);
     }
 
     private function setObjectProperty(object $object, string $propertyName, mixed $value): void
