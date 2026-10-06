@@ -1,0 +1,13 @@
+{
+  "version": "1.0.2",
+  "rc": 1,
+  "branch": "rc/1.0.2-rc.1",
+  "baseMaster": "d4fc6e55264063e0e3ffe855003cb60c9e3e12d6",
+  "tasks": [
+    167
+  ],
+  "repositories": {
+    "ControleOnline/api-platform-queue": "892f695a9407821f8584ca81641f276b04c1808c"
+  },
+  "frozen": true
+}
