@@ -1,7 +1,5 @@
 <?php
-
 namespace ControleOnline\Service;
-
 use ControleOnline\Entity\DeviceConfig;
 use ControleOnline\Entity\DisplayQueue;
 use ControleOnline\Entity\Order as OrderEntity;
@@ -14,12 +12,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface
 as Security;
 use Symfony\Component\HttpFoundation\RequestStack;
-
 class OrderProductQueueService
 {
     private string $displayDeviceType = 'DISPLAY';
     private string $displayConfigKey = 'display-id';
-
     private $request;
     private static $logger;
     public function __construct(
@@ -29,12 +25,10 @@ class OrderProductQueueService
         private WebsocketClient $websocketClient,
         private LoggerService $loggerService,
         RequestStack $requestStack
-
     ) {
         $this->request  = $requestStack->getCurrentRequest();
         self::$logger = $loggerService->getLogger('queue');
     }
-
     public function addProductToQueue(OrderProduct $orderProduct, bool $force = false)
     {
         $order = $orderProduct->getOrder();
@@ -42,11 +36,9 @@ class OrderProductQueueService
             // Carrinho nao entra em KDS; apenas pedido sale pode gerar fila de producao.
             return;
         }
-
         if (!$force && !$this->canManageQueueForOrder($order)) {
             return;
         }
-
         $queue = $orderProduct->getProduct()?->getQueue();
         if (!$queue instanceof Queue) {
             return;
@@ -254,7 +246,7 @@ class OrderProductQueueService
 
         $this->pushToCompanyDevices(
             $provider,
-            $this->buildQueueEvents(
+            QueueMutationEvents::build(
                 $provider->getId(),
                 $order?->getId(),
                 $orderProductQueue->getQueue()?->getId(),
@@ -262,37 +254,6 @@ class OrderProductQueueService
                 $event
             )
         );
-    }
-
-    private function buildQueueEvents(
-        int $companyId,
-        ?int $orderId = null,
-        ?int $queueId = null,
-        ?int $orderProductQueueId = null,
-        string $event = 'order_product_queue.updated'
-    ): array {
-        $baseEvent = [
-            'event' => $event,
-            'company' => $companyId,
-            'sentAt' => date(DATE_ATOM),
-        ];
-
-        if ($orderId) {
-            $baseEvent['order'] = $orderId;
-        }
-
-        if ($queueId) {
-            $baseEvent['queue'] = $queueId;
-        }
-
-        if ($orderProductQueueId) {
-            $baseEvent['orderProductQueue'] = $orderProductQueueId;
-        }
-
-        return [
-            array_merge(['store' => 'queues'], $baseEvent),
-            array_merge(['store' => 'order_products_queue'], $baseEvent),
-        ];
     }
 
     private function closeOrderQueuesAndNotifyDisplays(OrderEntity $order): void
@@ -359,14 +320,14 @@ class OrderProductQueueService
         $orderId = $this->normalizeEntityId($order->getId());
 
         if (empty($queueIds)) {
-            return $this->buildQueueEvents($companyId, $orderId, null, null, $event);
+            return QueueMutationEvents::build($companyId, $orderId, null, null, $event);
         }
 
         $events = [];
         foreach ($queueIds as $queueId) {
             $events = array_merge(
                 $events,
-                $this->buildQueueEvents($companyId, $orderId, $queueId, null, $event)
+                QueueMutationEvents::build($companyId, $orderId, $queueId, null, $event)
             );
         }
 
@@ -529,8 +490,10 @@ class OrderProductQueueService
                 continue;
             }
 
-            $sentDevices[$deviceId] = true;
-            $this->websocketClient->push($device, $payload);
+            $sentDevices[$deviceId] = $device;
+        }
+        if ($sentDevices !== []) {
+            $this->websocketClient->pushMany(array_values($sentDevices), $payload);
         }
     }
 }
